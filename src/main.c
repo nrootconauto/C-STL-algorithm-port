@@ -564,14 +564,6 @@ char* algo_sorted_set_intersection(size_t size,char* first1,char* last1,char* fi
 	}
 	return dest;
 }
-char* aglo_sorted_set_difference(size_t size,char* first1,char* last1,char* first2,char* last2,char* dest,algo_predicate pred,algo_copy_func copy) {
-	while(first1!=last1&&first2!=last2) {
-		if(pred(first1,first2)) {
-			copy(2,first1,dest);
-			dest+=size;
-		}
-	}
-}
 char* algo_sorted_set_difference(size_t size,char* first1,char* last1,char* first2,char* last2,char* result,algo_predicate pred,algo_copy_func copy) {
 	while(first1!=last1&&first2!=last2) {
 		if(pred(2,first1,first2)) {
@@ -583,6 +575,18 @@ char* algo_sorted_set_difference(size_t size,char* first1,char* last1,char* firs
 		}
 	}
 	return algo_copy(size,first1,last1,result,copy);
+}
+char* algo_sorted_symmetric_difference(size_t size,char* start1,char* end1,char* start2,char* end2,char* result,algo_predicate pred,algo_copy_func copy) {
+	if(start1==end1) return algo_copy(size,start2,end2,result,copy);
+	if(start1==end2) return algo_copy(size,start1,end1,result,copy);
+	if(pred(start1,start2)) {
+		copy(2,start1,result);
+		result+=size;start1+=size;
+	} else if(pred(start2,start1)) {
+		copy(2,start2,result);
+		result+=size;start2+=size;
+	} else
+		start1+=size,start2+=size;
 }
 //inplace_merge
 //nth element
