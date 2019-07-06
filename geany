@@ -29,12 +29,15 @@ long_line_column=72
 
 [files]
 current_page=0
-FILE_NAME_0=9752;C;0;EUTF-8;1;1;0;%2Fhome%2Fclayton%2FProjects%2FC_STL_algorithm_port%2Fsrc%2Fmain.c;0;4
+FILE_NAME_0=0;C;0;EUTF-8;1;1;0;%2Fhome%2Fclayton%2FProjects%2FC_STL_algorithm_port%2Fsrc%2Fmain.c;0;4
 
 [VTE]
-last_dir=/home/clayton/Projects/C_STL_algorithm_port
+last_dir=/home/clayton/Projects/C_STL_algorithm_port/src
 
 [build-menu]
 NF_00_LB=_Make
 NF_00_CM=make
 NF_00_WD=/home/clayton/Projects/C_STL_algorithm_port
+EX_00_LB=_Execute
+EX_00_CM=/home/clayton/Projects/C_STL_algorithm_port//build/main
+EX_00_WD=

@@ -588,6 +588,34 @@ char* algo_sorted_symmetric_difference(size_t size,char* start1,char* end1,char*
 	} else
 		start1+=size,start2+=size;
 }
+char* algo_min_element(size_t size,char* first,char* end,algo_predicate pred) {
+	if(first==last) return last;
+	char* smallest=first;
+	first+=size;
+	while(first!=last)  {
+		if(pred(first,smallest))
+			smallest=first;
+		first+=size;
+	}
+	return smallest;
+} 
+char* algo_max_element(size_t size,char* first,char* end,algo_predicate pred) {
+	if(first==last) return last;
+	char* biggest=first;
+	first+=size;
+	while(first!=last)  {
+		if(pred(biggest,first))
+			biggest=first;
+		first+=size;
+	}
+	return biggest;
+}
+struct algo_pair algo_minmax_element(size_t size,char* start,char* end,algo_predicate pred) {
+	struct algo_pair retval;
+	retval.first=algo_min_element(size,start,end,pred);
+	retval.second=algo_max_element(size,start,end,pred);
+	return retval;
+}
 //inplace_merge
 //nth element
 //stablwe partition
