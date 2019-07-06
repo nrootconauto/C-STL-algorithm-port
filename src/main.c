@@ -644,20 +644,33 @@ bool algo_next_permutation(size_t size,char* first,char* last,algo_predicate pre
 	}
 	return true;
 }
+bool algo_prev_permutation(size_t size,char* first,char* last,algo_predicate pred,algo_move_func move) {
+	size_t length=(size_t)(last-first)/size;
+	size_t i=length-1;
+	while(pred(2,first+size*(i-1),first+size*i))
+		if(--i==0)
+			return false;
+	size_t j=i+1;
+	while(j<length&&pred(2,first+size*j,first+size*(i-1)))
+		j++;
+	algo_swap(size,first+size*(i-1),first+size*(j-1),move);
+	algo_reverse(size,first+i*size,last,move);
+	return true;
+}
 //inplace_merge
 //nth element
 //stablwe partition
 //partialSort
 //stalbe sort
 int main() {
-	int list1[]={1,2,3};
+	int list1[]={3,2,1};
 	bool test(int argsNum,int* x,int* y) {
 		return *x<=*y;
 	}
 	void* mover(int argc,int* in,int* out) {
 		*out=*in;
 	}
-	while(algo_next_permutation(sizeof(int),list1,list1+3,test,mover))
+	while(algo_prev_permutation(sizeof(int),list1,list1+3,test,mover))
 		printf("%i.%i.%i\n",list1[0],list1[1],list1[2]);
 	return EXIT_SUCCESS;
 }
