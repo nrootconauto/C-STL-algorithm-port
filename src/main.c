@@ -616,6 +616,14 @@ struct algo_pair algo_minmax_element(size_t size,char* start,char* end,algo_pred
 	retval.second=algo_max_element(size,start,end,pred);
 	return retval;
 }
+bool algo_lexicographical_compare(size_t size,char* first1,char* last1,char* first2,char* end2,algo_predicate pred) {
+	while(first1!=last1) {
+		if(first2==last2 && pred(first2,first1)) return false;
+		else if(pred(first1,first2)) return true;
+		first1+=size;first2+=size;
+	}
+	return first2!=last2;
+}
 //inplace_merge
 //nth element
 //stablwe partition
