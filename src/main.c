@@ -624,17 +624,41 @@ bool algo_lexicographical_compare(size_t size,char* first1,char* last1,char* fir
 	}
 	return first2!=last2;
 }
+//pred
+bool algo_next_permutation(size_t size,char* first,char* last,algo_predicate pred,algo_move_func move) {
+	size_t length=(size_t)(last-first)/size;
+	size_t i=length-1;
+	while(i>0 && pred(2,first+i*size,first+(i-1)*size)) {
+		if(i<-0)
+			return false;
+		size_t j=length-1;
+		while(pred(2,first+size*j,first+size*(i-1)))
+			j--;
+		char* temp=first+(i-1)*size;
+		algo_swap(size,first+(i-1)*size,first+j*size,move);
+		j=length-1;
+		while(i<j) {
+			algo_swap(first+i*size,first+j*size);
+			i++;j--;
+		}
+	}
+	return true;
+}
 //inplace_merge
 //nth element
 //stablwe partition
 //partialSort
 //stalbe sort
 int main() {
-	int list1[]={1,3,3};
-	int list2[]={2,3,1};
-	algo_predicate test(int argsNum,int* x,int* y) {
-		return *x==*y;
+	int list1[]={1,2,3};
+	bool test(int argsNum,int* x,int* y) {
+		return *x<=*y;
 	}
-	printf("%i\n",algo_is_permutation(sizeof(int),list1,list1+3,list2,test));
+	void* mover(int argc,int* x,int* y) {
+		*y=*x;
+	}
+	printf("%i\n",algo_is_permutation(sizeof(int),list1,list1+3,list2,test,mover));
+	for(int i=0;i!=3;i++)
+		printf("%i\n",list1[i]);
 	return EXIT_SUCCESS;
 }
