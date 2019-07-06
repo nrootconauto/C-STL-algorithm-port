@@ -226,9 +226,9 @@ char* algo_copy_backward(size_t size,char* first,char* last,char* dest,algo_copy
 }
 void algo_swap(size_t size,char* a,char* b,algo_move_func mover) {
 	char* thing=malloc(size);
-	mover(2,thing,a);
-	mover(2,a,b);
-	mover(2,b,thing);
+	mover(2,a,thing);
+	mover(2,b,a);
+	mover(2,thing,b);
 	free(thing);
 }
 char* algo_swap_ranges(size_t size,char* first1,char* last1,char* first2,algo_move_func mover) {
@@ -589,17 +589,17 @@ char* algo_sorted_symmetric_difference(size_t size,char* start1,char* end1,char*
 		start1+=size,start2+=size;
 }
 char* algo_min_element(size_t size,char* first,char* end,algo_predicate pred) {
-	if(first==last) return last;
+	if(first==end) return end;
 	char* smallest=first;
 	first+=size;
-	while(first!=last)  {
+	while(first!=end)  {
 		if(pred(first,smallest))
 			smallest=first;
 		first+=size;
 	}
 	return smallest;
 } 
-char* algo_max_element(size_t size,char* first,char* end,algo_predicate pred) {
+char* algo_max_element(size_t size,char* first,char* last,algo_predicate pred) {
 	if(first==last) return last;
 	char* biggest=first;
 	first+=size;
@@ -616,7 +616,7 @@ struct algo_pair algo_minmax_element(size_t size,char* start,char* end,algo_pred
 	retval.second=algo_max_element(size,start,end,pred);
 	return retval;
 }
-bool algo_lexicographical_compare(size_t size,char* first1,char* last1,char* first2,char* end2,algo_predicate pred) {
+bool algo_lexicographical_compare(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
 	while(first1!=last1) {
 		if(first2==last2 && pred(first2,first1)) return false;
 		else if(pred(first1,first2)) return true;
@@ -624,23 +624,23 @@ bool algo_lexicographical_compare(size_t size,char* first1,char* last1,char* fir
 	}
 	return first2!=last2;
 }
-//pred
+//
+//https://www.nayuki.io/page/next-lexicographical-permutation-algorithm
 bool algo_next_permutation(size_t size,char* first,char* last,algo_predicate pred,algo_move_func move) {
 	size_t length=(size_t)(last-first)/size;
 	size_t i=length-1;
-	while(i>0 && pred(2,first+i*size,first+(i-1)*size)) {
-		if(i<-0)
-			return false;
-		size_t j=length-1;
-		while(pred(2,first+size*j,first+size*(i-1)))
-			j--;
-		char* temp=first+(i-1)*size;
-		algo_swap(size,first+(i-1)*size,first+j*size,move);
-		j=length-1;
-		while(i<j) {
-			algo_swap(first+i*size,first+j*size);
-			i++;j--;
-		}
+	while(i>0 && pred(2,first+i*size,first+(i-1)*size))
+		i--;
+	if(i<=0)
+		return false;
+	size_t j=length-1;
+	while(pred(2,first+size*j,first+size*(i-1)))
+		j--;
+	algo_swap(size,first+(i-1)*size,first+j*size,move);
+	j=length-1;
+	while(i<j) {
+		algo_swap(size,first+i*size,first+j*size,move);
+		i++;j--;
 	}
 	return true;
 }
@@ -654,11 +654,10 @@ int main() {
 	bool test(int argsNum,int* x,int* y) {
 		return *x<=*y;
 	}
-	void* mover(int argc,int* x,int* y) {
-		*y=*x;
+	void* mover(int argc,int* in,int* out) {
+		*out=*in;
 	}
-	printf("%i\n",algo_is_permutation(sizeof(int),list1,list1+3,list2,test,mover));
-	for(int i=0;i!=3;i++)
-		printf("%i\n",list1[i]);
+	while(algo_next_permutation(sizeof(int),list1,list1+3,test,mover))
+		printf("%i.%i.%i\n",list1[0],list1[1],list1[2]);
 	return EXIT_SUCCESS;
 }
