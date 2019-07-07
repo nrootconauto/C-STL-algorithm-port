@@ -210,21 +210,23 @@ char* __algo_search_n(size_t size,char* first,char* last,int n,char* val,algo_pr
 		first+=size;
 	}
 }
-char* algo_copy(size_t size,char* first,char* last,char* dest,algo_copy_func copyFunc) {
+char* __algo_copy(size_t size,char* first,char* last,char* dest,algo_copy_func copyFunc) {
 	while(first!=last) {
 		copyFunc(2,first,dest);
 		first+=size;dest+=size;
 	}
 	return last;
 }
-char* algo_copy_n(size_t size,char* first,int howMany,char* out,algo_copy_func copyFunc) {
+#define algo_copy_n(type,first,howMany,out,copyFunc) __algo_copy_n(sizeof(type),$AA(first),$AA(howMany),$AA(out),$AF(copyFunc))
+char* __algo_copy_n(size_t size,char* first,int howMany,char* out,algo_copy_func copyFunc) {
 	int i=0;
 	while(i!=howMany) {
 		copyFunc(2,first+i++*size,out);
 	}
 	return first+i*size;
 }
-char* algo_copy_if(size_t size,char* first,char* last,char* dest,algo_predicate pred,algo_copy_func copyFunc) {
+#define algo_copy_if(type,first,last,dest,pred,copyFunc) __algo_copy_if(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AA(copyFunc))
+char* __algo_copy_if(size_t size,char* first,char* last,char* dest,algo_predicate pred,algo_copy_func copyFunc) {
 	while(first!=last) {
 		if(pred,1,first) {
 			copyFunc(2,first,dest);
@@ -234,7 +236,8 @@ char* algo_copy_if(size_t size,char* first,char* last,char* dest,algo_predicate 
 	}
 	return dest;
 }
-char* algo_copy_backward(size_t size,char* first,char* last,char* dest,algo_copy_func copyFunc) {
+#define algo_copy_backward(type,first,last,dest,copyFunc) __algo_copy_backward(sizeof(type),$AA(first),$AA(last),$AA(dest),$AF(copyFunc))
+char* __algo_copy_backward(size_t size,char* first,char* last,char* dest,algo_copy_func copyFunc) {
 	while(last!=first) {
 		last-=size;
 		copyFunc(2,last,dest);
@@ -242,6 +245,7 @@ char* algo_copy_backward(size_t size,char* first,char* last,char* dest,algo_copy
 	}
 	return dest;
 }
+#define algo_swap(type,a,b,mover) __algo_swap(sizeof(type),$AA(a),$AA(b),$AF(mover))
 void __algo_swap(size_t size,char* a,char* b,algo_move_func mover) {
 	char* thing=malloc(size);
 	mover(2,a,thing);
@@ -249,6 +253,7 @@ void __algo_swap(size_t size,char* a,char* b,algo_move_func mover) {
 	mover(2,thing,b);
 	free(thing);
 }
+#define algo_swap_ranges(type,first1,last1,first2,mover) __algo_swap_ranges(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AF(mover))
 char* __algo_swap_ranges(size_t size,char* first1,char* last1,char* first2,algo_move_func mover) {
 	while(first1!=last1) {
 		__algo_swap(size,first1,first2,mover);
@@ -257,7 +262,8 @@ char* __algo_swap_ranges(size_t size,char* first1,char* last1,char* first2,algo_
 	}
 	return first2;
 }
-char* algo_transform(size_t size,char* first1,char* last1,char* dest,algo_function mutator) {
+#define algo_transform(type,first1,last1,dest,mutator) __algo_transform(sizeof(type),$AA(first1),$AA(last1),$AA(dest),$AF(mutator))
+char* __algo_transform(size_t size,char* first1,char* last1,char* dest,algo_function mutator) {
 	while(first1!=last1)	{
 		mutator(2,first1,dest);
 		dest+=size;
@@ -265,13 +271,15 @@ char* algo_transform(size_t size,char* first1,char* last1,char* dest,algo_functi
 	}
 	return dest;
 }
-void algo_replace_copy_if(size_t size,char* first,char* last,algo_predicate pred,char* newValue,algo_replace_func replacer) {
+#define algo_replace_copy_if(type,first,last,pred,newValue,replacer) __algo_replace_copy_if(sizeof(type),$AA(first),$AA(last),$AP(pred),$AA(newValue),$AF(replacer))
+void __algo_replace_copy_if(size_t size,char* first,char* last,algo_predicate pred,char* newValue,algo_replace_func replacer) {
 	while(first!=last) {
 		if(pred(1,first)) replacer(2,first,newValue);
 		first+=size;
 	}
 }
-char* algo_replace_if(size_t size, char* first, char* last, char* dest, algo_predicate pred, char* newValue,algo_replace_func replacer){
+#define algo_replace_if(type,first,last,dest,pred,newValue,replacer) __algo_replace_if(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AA(newValue),$AF(replacer))
+char* __algo_replace_if(size_t size, char* first, char* last, char* dest, algo_predicate pred, char* newValue,algo_replace_func replacer) {
 	while(first!=last) {
 		if(pred(1,first)) {
 			replacer(2,dest,newValue);
@@ -281,13 +289,15 @@ char* algo_replace_if(size_t size, char* first, char* last, char* dest, algo_pre
 	}
 	return dest;
 }
-void algo_fill(size_t size,char* first,char* last,char* value,algo_copy_func copy) {
+#define algo_fill(type,first,last,value,copy) __algo_fill(sizeof(type),$AA(first),$AA(last),$AA(value),$AA(copy))
+void __algo_fill(size_t size,char* first,char* last,char* value,algo_copy_func copy) {
 	while(first!=last) {
 		copy(2,first,value);
 		first+=size;
 	}
 }
-char* algo_fill_n(size_t size,char* first,char* last,int howMany,char* value,algo_copy_func copy) {
+#define algo_fill_n(type,first,last,howMany,value,copy) __algo_fill_n(sizeof(type),$AA(first),$AA(last),$AA(howMany),$AA(value),$AA(copy))
+char* __algo_fill_n(size_t size,char* first,char* last,int howMany,char* value,algo_copy_func copy) {
 	while(howMany>0) {
 		copy(2,first,value);
 		first+=size;
@@ -295,20 +305,22 @@ char* algo_fill_n(size_t size,char* first,char* last,int howMany,char* value,alg
 	}
 	return first;
 }
-void algo_generate(size_t size,char* first,char* last,algo_function generator) {
+#define algo_generate(type,first,last,generator)__algo_generate(sizeof(type),$AA(first),$AA(last),$AF(generator))
+void __algo_generate(size_t size,char* first,char* last,algo_function generator) {
 	while(first!=last) {
 		generator(1,first);
 		//memcpy(first,generator(0),size);
 		first+=size;
 	}
 }
-void algo_generate_n(size_t size,char* first,int n,algo_function gen) {
+#define algo_generate_n(type,first,n,gen) __algo_generate_n(sizeof(type),$AA(first),$AA(n),$AF(gen))
+void __algo_generate_n(size_t size,char* first,int n,algo_function gen) {
 	while(n-- >0) {
 		gen(1,first);
 		first+=size;
 	}
 }
-char* algo_remove_if(size_t size, char* first, char* last, algo_predicate pred,algo_replace_func replacer) {
+char* __algo_remove_if(size_t size, char* first, char* last, algo_predicate pred,algo_replace_func replacer) {
 	char* result=first;
 	while(first!=last) {
 		if(!pred(1,first)) {
@@ -319,10 +331,11 @@ char* algo_remove_if(size_t size, char* first, char* last, algo_predicate pred,a
 	}
 	return first;
 }
-char* remove_copy_if(size_t size,char* first,char* last,char* dest,algo_predicate pred,algo_copy_func copyFunc) {
+#define algo_remove_copy_if(type,first,last,dest,pred,copyFunc) __algo_remove_copy_if(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AA(copyFunc))
+char* __algo_remove_copy_if(size_t size,char* first,char* last,char* dest,algo_predicate pred,algo_copy_func copyFunc) {
 	while(first!=last) {
 		if(!pred(1,first)) {
-			algo_copy(size,first,last,dest,copyFunc);
+			__algo_copy(size,first,last,dest,copyFunc);
 			dest+=size;
 		}
 		first+=size;
@@ -330,7 +343,8 @@ char* remove_copy_if(size_t size,char* first,char* last,char* dest,algo_predicat
 	return dest;
 }
 //removes all but one of uitms with conesecutive values
-char* algo_unique(size_t size,char* first,char* last,algo_predicate pred,algo_replace_func replacer) {
+#define algo_unique(type,first,last,pred,replacer) __algo_unique(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(replacer))
+char* __algo_unique(size_t size,char* first,char* last,algo_predicate pred,algo_replace_func replacer) {
 	if(first==last)
 		return last;
 	char* result=first;
@@ -344,19 +358,21 @@ char* algo_unique(size_t size,char* first,char* last,algo_predicate pred,algo_re
 	}
 	return size+result;
 }
-char* algo_unique_copy(size_t size, char* first, char* last,char* dest,algo_predicate pred,algo_copy_func copy) {
+#define algo_unique_copy(type,first,last,dest,pred,copy) __algo_unique_copy(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AA(copy))
+char* __algo_unique_copy(size_t size, char* first, char* last,char* dest,algo_predicate pred,algo_copy_func copy) {
 	if(first==last)
 		return dest;
-	algo_copy(size,first,first+size,dest,copy);
+	__algo_copy(size,first,first+size,dest,copy);
 	while(first+size!=last) {
 		first+=size;
 		if(!pred(2,dest,first)) {
 			dest+=size;
-			algo_copy(size,first,first+size,dest,copy);
+			__algo_copy(size,first,first+size,dest,copy);
 		}
 	}
 	return dest+size;
 }
+#define algo_reverse(type,first,last,move) __algo_reverse(sizeof(type),$AA(first),$AA(last),$AF(move))
 void __algo_reverse(size_t size,char* first,char* last,algo_move_func move) {
 	while((first!=last)&&(first!=last-size)) {
 		last-=size;
@@ -364,15 +380,17 @@ void __algo_reverse(size_t size,char* first,char* last,algo_move_func move) {
 		first+=size;
 	}
 }
+#define algo_reverse_copy(type,first,last,dest,copyFunc) __algo_reverse_copy(sizeof(type),$AA(first),$AA(last),$AA(dest),$AF(copyFunc))
 char* __algo_reverse_copy(size_t size, char* first, char* last,char* dest,algo_function copyFunc) {
 	while(first!=last) {
 		last-=size;
-		algo_copy(size,last,last+size,dest,copyFunc);
+		__algo_copy(size,last,last+size,dest,copyFunc);
 		dest+=size;
 	}
 	return dest;
 }
-void algo_rotate(size_t size,char* first,char* middle,char* last,algo_replace_func replace) {
+#define algo_rotate(type,first,middle,last,replace) __algo_rotate(sizeof(type),$AA(first),$AA(middle),$AA(last),$AF(replace))
+void __algo_rotate(size_t size,char* first,char* middle,char* last,algo_replace_func replace) {
 	char* next=middle;
 	while(first!=next) {
 		__algo_swap(3,first,next,replace);
@@ -381,17 +399,20 @@ void algo_rotate(size_t size,char* first,char* middle,char* last,algo_replace_fu
 		else if(first==middle) middle=next;
 	}
 }
-char* algo_rotate_copy(size_t size,char* first,char* middle,char* last,char* dest,algo_copy_func copyFunc) {
-	algo_copy(size,middle,last,dest,copyFunc);
-	return algo_copy(size,first,middle,dest,copyFunc);
+#define algo_rotate_copy(type,first,middle,last,dest,copyFunc) __algo_rotate_copy(sizeof(type),$AA(first),$AA(middle),$AA(last),$AA(dest),$AA(copyFunc))
+char* __algo_rotate_copy(size_t size,char* first,char* middle,char* last,char* dest,algo_copy_func copyFunc) {
+	__algo_copy(size,middle,last,dest,copyFunc);
+	return __algo_copy(size,first,middle,dest,copyFunc);
 }
-void algo_random_shuffle(size_t size,char* first,char* last,algo_move_func move) {
+#define algo_random_shuffle(type,first,last,move) __algo_random_shuffle(sizeof(type),$AA(first),$AA(last),$AF(move))
+void __algo_random_shuffle(size_t size,char* first,char* last,algo_move_func move) {
 	size_t i,n;
 	n=(last-first);
 	for(i=n-1;i>0;i-=size)
 		__algo_swap(3,first+i,first+rand(),move);
 }
-bool algo_is_partitioned(size_t size,char* first,char* last,algo_predicate pred) {
+#define algo_is_partitioned(type,first,last,pred) __algo_is_partitioned(sizeof(type),$AA(first),$AA(last),$AP(pred))
+bool __algo_is_partitioned(size_t size,char* first,char* last,algo_predicate pred) {
 	while(first!=last&&pred(1,first))
 		first+=size;
 	while(first!=last) {
@@ -401,7 +422,8 @@ bool algo_is_partitioned(size_t size,char* first,char* last,algo_predicate pred)
 	}
 	return true;
 }
-char* algo_partition(size_t size,char* first,char* last,algo_predicate pred,algo_move_func move) {
+#define algo_partition(type,first,last,pred,move) __algo_partition(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(move))
+char* __algo_partition(size_t size,char* first,char* last,algo_predicate pred,algo_move_func move) {
 	while(first!=last) {
 		while(pred(1,first)) {
 			first+=size;
@@ -418,7 +440,8 @@ char* algo_partition(size_t size,char* first,char* last,algo_predicate pred,algo
 	}
 	return first;
 }
-struct algo_pair algo_partition_copy(size_t size,char* first,char* last,char* destTrue,char* destFalse,algo_predicate pred,algo_copy_func copy) {
+#define algo_partition_copy(type,first,last,destTrue,destFalse,pred,copy) __algo_partition_copy(sizeof(type),$AA(first),$AA(last),$AA(destTrue),$AA(destFalse),$AP(pred),$AF(copy))
+struct algo_pair __algo_partition_copy(size_t size,char* first,char* last,char* destTrue,char* destFalse,algo_predicate pred,algo_copy_func copy) {
 	while(first!=last) {
 		if(pred(1,first)) {
 			copy(2,first,destTrue);
@@ -434,7 +457,8 @@ struct algo_pair algo_partition_copy(size_t size,char* first,char* last,char* de
 	retVal.second=destFalse;
 	return retVal;
 }
-char* algo_partiton_point(size_t size,char* start,char* end,algo_predicate pred) {
+#define algo_partiton_point(type,start,end,pred) __algo_partiton_point(sizeof(type),$AA(start),$AA(end),$AP(pred))
+char* __algo_partiton_point(size_t size,char* start,char* end,algo_predicate pred) {
 	size_t n=(size_t)(end-start)/size;
 	while(n>0) {
 		char* it=start;
@@ -449,18 +473,20 @@ char* algo_partiton_point(size_t size,char* start,char* end,algo_predicate pred)
 	}
 	return start;
 }
-void algo_sort(size_t size,char* start,char* end,algo_predicate pred,algo_move_func move) {
+#define algo_sort(type,start,end,pred,move) __algo_sort(sizeof(type),$AA(start),$AA(end),$AP(pred),$AF(move))
+void __algo_sort(size_t size,char* start,char* end,algo_predicate pred,algo_move_func move) {
 	void qs(char* left,char* right) {
 		if(left==right)
 			return;
 		char* pivot=left+(right-left)/2;
-		char* partPoint=algo_partition(size,left,right,pred,move);
+		char* partPoint=__algo_partition(size,left,right,pred,move);
 		qs(left,partPoint-size);
 		qs(partPoint+size,right);
 	}
 	qs(start,end);
 }
-bool algo_is_sorted(size_t size,char* first,char* last,algo_predicate pred) {
+#define algo_is_sorted(type,first,last,pred) __algo_is_sorted(sizeof(type),$AA(first),$AA(last),$AP(pred))
+bool __algo_is_sorted(size_t size,char* first,char* last,algo_predicate pred) {
 	if(first==last)
 		return true;
 	char* next=first;
@@ -472,7 +498,8 @@ bool algo_is_sorted(size_t size,char* first,char* last,algo_predicate pred) {
 	}
 	return true;
 }
-char* algo_is_sorted_until(size_t size,char* first,char* last,algo_predicate pred) {
+#define algo_is_sorted_until(type,first,last,pred)__algo_is_sorted_until(sizeof(type),$AA(first),$AA(last),$AP(pred))
+char* __algo_is_sorted_until(size_t size,char* first,char* last,algo_predicate pred) {
 	if(first==last) return first;
 	char* next=first;
 	while(next+size!=last) {
@@ -482,7 +509,8 @@ char* algo_is_sorted_until(size_t size,char* first,char* last,algo_predicate pre
 	}
 	return last;
 }
-char* algo_sorted_lower_bound(size_t size,char* first,char* last,char* val,algo_predicate pred) {
+#define algo_sorted_lower_bound(type,first,last,val,pred) __algo_sorted_lower_bound(sizeof(type),$AA(first),$AA(last),$AA(val),$AP(pred))
+char* __algo_sorted_lower_bound(size_t size,char* first,char* last,char* val,algo_predicate pred) {
 	char* it;
 	size_t count,step;
 	count=(last-first)/size;
@@ -499,7 +527,8 @@ char* algo_sorted_lower_bound(size_t size,char* first,char* last,char* val,algo_
 	}
 	return first;
 }
-char* algo_sorted_upper_bound(size_t size,char* first,char* last,char* val,algo_predicate pred) {
+#define algo_sorted_upper_bound(type,first,last,val,pred) __algo_sorted_upper_bound(sizeof(type),$AA(first),$AA(last),$AA(val),$AP(pred))
+char* __algo_sorted_upper_bound(size_t size,char* first,char* last,char* val,algo_predicate pred) {
 	char* it;
 	size_t count,step;
 	count=(last-first)/size;
@@ -516,32 +545,35 @@ char* algo_sorted_upper_bound(size_t size,char* first,char* last,char* val,algo_
 	}
 	return first;
 }
-struct algo_pair algo_sorted_equal_range(size_t size,char* first,char* last,char* val,algo_predicate pred) {
+#define algo_sorted_equal_range(type,first,last,val,pred) __algo_sorted_equal_range(sizeof(type),$AA(first),$AA(last),$AA(val),$AP(pred))
+struct algo_pair __algo_sorted_equal_range(size_t size,char* first,char* last,char* val,algo_predicate pred) {
 	char* it=algo_sorted_lower_bound(size,first,last,val,pred);
 	char* end=algo_sorted_upper_bound(size,it,last,val,pred);
 	struct algo_pair retVal;
 	retVal.first=it;retVal.second=end;
 	return retVal;
 }
-bool algo_sorted_binary_search(size_t size,char* first,char* last,char* val,algo_predicate pred) {
-	first=algo_sorted_lower_bound(size,first,last,val,pred);
+#define algo_sorted_binary_search(type,first,last,val,pred) __algo_sorted_binary_search(sizeof(type),$AA(first),$AA(last),$AA(val),$AP(pred))
+bool __algo_sorted_binary_search(size_t size,char* first,char* last,char* val,algo_predicate pred) {
+	first=__algo_sorted_lower_bound(size,first,last,val,pred);
 	return (first!=last&&!(pred(2,val,first)));
 }
 char* algo_sorted_merge(size_t size,char* first1,char* last1,char* first2,char* last2,char* dest,algo_predicate pred,algo_copy_func copy) {
 	for(;;) {
-		if(first1==last1) return algo_copy(size,first2,last2,dest,copy);
-		if(first2==last2) return algo_copy(size,first1,last1,dest,copy);
+		if(first1==last1) return __algo_copy(size,first2,last2,dest,copy);
+		if(first2==last2) return __algo_copy(size,first1,last1,dest,copy);
 		bool which=pred(2,first2,first1);
 		char* temp=which?first2:first1;
 		if(which)
 			first2+=size;
 		else 
 			first1+=size;
-		algo_copy(size,temp,temp+size,dest,copy);
+		__algo_copy(size,temp,temp+size,dest,copy);
 		dest+=size;
 	}
 }
-bool aglo_sorted_includes(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
+#define algo_sorted_includes(type,first1,last1,first2,last2,pred) __algo_sorted_includes(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AP(pred))
+bool __algo_sorted_includes(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
 	while(first2,last2) {
 		if((first1==last1)||(pred(2,first2,first1))) return false;
 		if(!pred(2,first1,first2)) first2+=size;
@@ -549,25 +581,26 @@ bool aglo_sorted_includes(size_t size,char* first1,char* last1,char* first2,char
 	}
 	return true;
 }
-char* algo_sorted_set_union(size_t size,char* first1,char* last1,char* first2,char* last2,char* dest,algo_predicate pred,algo_copy_func copy) {
+#define algo_sorted_set_union(type,first1,last1,first2,last2,dest,pred,copy) __algo_sorted_set_union(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AA(dest),$AP(pred),$AF(copy))
+char* __algo_sorted_set_union(size_t size,char* first1,char* last1,char* first2,char* last2,char* dest,algo_predicate pred,algo_copy_func copy) {
 	for(;;) {
-		if(first1==last1) return algo_copy(size,first2,last2,dest,copy);
-		if(first2==last2) return algo_copy(size,first1,last1,dest,copy);
+		if(first1==last1) return __algo_copy(size,first2,last2,dest,copy);
+		if(first2==last2) return __algo_copy(size,first1,last1,dest,copy);
 		if(pred(2,first1,first2)) {
-			algo_copy(size,first1,first1+size,dest,copy);
+			__algo_copy(size,first1,first1+size,dest,copy);
 			first1+=size;
 		} else if(pred(2,first2,first1)) {
-			algo_copy(size,first2,first2+size,dest,copy);
+			__algo_copy(size,first2,first2+size,dest,copy);
 			first2+=size;
 		} else {
-			
 			first1+=size;
 			first2+=size;
 		}
 		dest+=size;	
 	}
 }
-char* algo_sorted_set_intersection(size_t size,char* first1,char* last1,char* first2,char* last2,char* dest,algo_predicate pred,algo_copy_func copy) {
+#define algo_sorted_set_intersection(type,first1,last1,first2,last2,dest,pred,copy)__algo_sorted_set_intersection(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AA(dest),$AP(pred),$AF(copy))
+char* __algo_sorted_set_intersection(size_t size,char* first1,char* last1,char* first2,char* last2,char* dest,algo_predicate pred,algo_copy_func copy) {
 	while(first1!=last1 && first2!=last2) {
 		if(pred(2,first1,first2)) first1+=size;
 		else if(pred(2,first2,first1)) first2+=size;
@@ -580,7 +613,8 @@ char* algo_sorted_set_intersection(size_t size,char* first1,char* last1,char* fi
 	}
 	return dest;
 }
-char* algo_sorted_set_difference(size_t size,char* first1,char* last1,char* first2,char* last2,char* result,algo_predicate pred,algo_copy_func copy) {
+#define algo_sorted_set_difference(type,first1,last1,first2,last2,result,pred,copy)__algo_sorted_set_difference(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AA(result),$AP(pred),$AF(copy))
+char* __algo_sorted_set_difference(size_t size,char* first1,char* last1,char* first2,char* last2,char* result,algo_predicate pred,algo_copy_func copy) {
 	while(first1!=last1&&first2!=last2) {
 		if(pred(2,first1,first2)) {
 			copy(2,first1,result);
@@ -590,11 +624,11 @@ char* algo_sorted_set_difference(size_t size,char* first1,char* last1,char* firs
 			first1+=size;first2+=size;
 		}
 	}
-	return algo_copy(size,first1,last1,result,copy);
+	return __algo_copy(size,first1,last1,result,copy);
 }
 char* __algo_sorted_symmetric_difference(size_t size,char* start1,char* end1,char* start2,char* end2,char* result,algo_predicate pred,algo_copy_func copy) {
-	if(start1==end1) return algo_copy(size,start2,end2,result,copy);
-	if(start1==end2) return algo_copy(size,start1,end1,result,copy);
+	if(start1==end1) return __algo_copy(size,start2,end2,result,copy);
+	if(start1==end2) return __algo_copy(size,start1,end1,result,copy);
 	if(pred(2,start1,start2)) {
 		copy(2,start1,result);
 		result+=size;start1+=size;
@@ -629,13 +663,16 @@ char* __algo_max_element(size_t size,char* first,char* last,algo_predicate pred)
 }
 #define algo_min_element(type,start,end,pred) __algo_min_element(sizeof(type),$AA(start),$AA(end),$AP(pred))
 #define algo_max_element(type,start,end,pred) __algo_max_element(sizeof(type),$AA(start),$AA(end),$AP(pred))
-struct algo_pair algo_minmax_element(size_t size,char* start,char* end,algo_predicate pred) {
+#define algo_minmax_element(type,start,end,pred)__algo_minmax_element(sizeof(type),$AA(start),$AA(end),$AP(pred))
+struct algo_pair __algo_minmax_element(size_t size,char* start,char* end,algo_predicate pred) {
 	struct algo_pair retval;
 	retval.first=__algo_min_element(size,start,end,pred);
 	retval.second=__algo_max_element(size,start,end,pred);
 	return retval;
 }
-bool algo_lexicographical_compare(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
+//\w+\*?\s+(\w+)\((?:\w+\*?\s+(\w+),?)*\)
+#define algo_lexicographical_compare(type,first1,last1,first2,last2,pred)__algo_lexicographical_compare(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AP(pred))
+bool __algo_lexicographical_compare(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
 	while(first1!=last1) {
 		if(first2==last2 && pred(2,first2,first1)) return false;
 		else if(pred(2,first1,first2)) return true;
@@ -677,7 +714,6 @@ bool __algo_prev_permutation(size_t size,char* first,char* last,algo_predicate p
 }
 
 #define algo_reverse(type,first,last,move) __algo_reverse(sizeof(type),$AA(first),$AA(last),$AF(move))
-#define algo_swap(type,a,b,move) __algo_swap(sizeof(type),$AA(a),$AA(b),$AF(move))
 #define algo_prev_permutation(type,first,last,pred,move) __algo_prev_permutation(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(move))
 #define algo_next_permutation(type,first,last,pred,move) __algo_next_permutation(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(move))
 
@@ -698,3 +734,15 @@ int main() {
 		printf("%i.%i.%i\n",list1[0],list1[1],list1[2]);
 	return EXIT_SUCCESS;
 }
+/*
+ * var type=/\w+\*?/
+var name=/\w+/
+function toMacro(str) {
+  str=str.replace(type,"")
+  let name1=str.match(name);
+  str=str.replace(name,"")
+  str=str.replace(/\(.+\)/,"$1")
+  alert(str)
+}
+toMacro("int x()")
+*/
