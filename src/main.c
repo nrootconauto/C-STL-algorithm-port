@@ -577,7 +577,7 @@ char* algo_sorted_set_difference(size_t size,char* first1,char* last1,char* firs
 	}
 	return algo_copy(size,first1,last1,result,copy);
 }
-char* algo_sorted_symmetric_difference(size_t size,char* start1,char* end1,char* start2,char* end2,char* result,algo_predicate pred,algo_copy_func copy) {
+char* __algo_sorted_symmetric_difference(size_t size,char* start1,char* end1,char* start2,char* end2,char* result,algo_predicate pred,algo_copy_func copy) {
 	if(start1==end1) return algo_copy(size,start2,end2,result,copy);
 	if(start1==end2) return algo_copy(size,start1,end1,result,copy);
 	if(pred(2,start1,start2)) {
@@ -589,7 +589,8 @@ char* algo_sorted_symmetric_difference(size_t size,char* start1,char* end1,char*
 	} else
 		start1+=size,start2+=size;
 }
-char* algo_min_element(size_t size,char* first,char* end,algo_predicate pred) {
+#define algo_sorted_symmetric_difference(type,start1,end1,start2,end2,result,pred) __algo_sorted_symmetric_difference(sizeof(type),$AA(start1),$AA(end1),$AA(start2),$AA(end2),$AA(result),$AP(pred))
+char* __algo_min_element(size_t size,char* first,char* end,algo_predicate pred) {
 	if(first==end) return end;
 	char* smallest=first;
 	first+=size;
@@ -600,7 +601,7 @@ char* algo_min_element(size_t size,char* first,char* end,algo_predicate pred) {
 	}
 	return smallest;
 } 
-char* algo_max_element(size_t size,char* first,char* last,algo_predicate pred) {
+char* __algo_max_element(size_t size,char* first,char* last,algo_predicate pred) {
 	if(first==last) return last;
 	char* biggest=first;
 	first+=size;
@@ -611,10 +612,12 @@ char* algo_max_element(size_t size,char* first,char* last,algo_predicate pred) {
 	}
 	return biggest;
 }
+#define algo_min_element(type,start,end,pred) __algo_min_element(sizeof(type),$AA(start),$AA(end),$AP(pred))
+#define algo_max_element(type,start,end,pred) __algo_max_element(sizeof(type),$AA(start),$AA(end),$AP(pred))
 struct algo_pair algo_minmax_element(size_t size,char* start,char* end,algo_predicate pred) {
 	struct algo_pair retval;
-	retval.first=algo_min_element(size,start,end,pred);
-	retval.second=algo_max_element(size,start,end,pred);
+	retval.first=__algo_min_element(size,start,end,pred);
+	retval.second=__algo_max_element(size,start,end,pred);
 	return retval;
 }
 bool algo_lexicographical_compare(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
@@ -662,6 +665,7 @@ bool __algo_prev_permutation(size_t size,char* first,char* last,algo_predicate p
 #define algo_swap(type,a,b,move) __algo_swap(sizeof(type),$AA(a),$AA(b),$AF(move))
 #define algo_prev_permutation(type,first,last,pred,move) __algo_prev_permutation(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(move))
 #define algo_next_permutation(type,first,last,pred,move) __algo_next_permutation(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(move))
+
 //inplace_merge
 //nth element
 //stablwe partition
