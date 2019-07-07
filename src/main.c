@@ -5,6 +5,9 @@
 #include <malloc.h>
 typedef bool(*algo_predicate)(int numArgs,...);
 typedef char* (*algo_function)(int numArgs,...); 
+#define $AP(predicate) (algo_predicate)(predicate)
+#define $AF(func) (algo_function)(func)
+#define $AA(argument) (char*)(argument)
 typedef algo_function algo_move_func;
 typedef algo_function algo_replace_func;
 typedef algo_function algo_copy_func;
@@ -148,9 +151,9 @@ bool algo_is_permutation(size_t size,char* first1,char* last1,char* first2,algo_
 		bool uni(int n,char* a) {
 			return pred(2,a,it);
 		}
-		if(algo_find_if(size,first1,it,uni)==it) {
-			int n=algo_count_if(size,first2,last2,uni);
-			if(n==0||algo_count_if(size,it,last1,uni)!=n)
+		if(algo_find_if(size,first1,it,$AP(uni))==it) {
+			int n=algo_count_if(size,first2,last2,$AP(uni));
+			if(n==0||algo_count_if(size,it,last1,$AP(uni))!=n)
 				return false;
 		}
 	}
@@ -175,10 +178,10 @@ char* algo_search(size_t size,char* first1,char* last1,char* first2,char* last2,
 	return last1;
 }
 char* algo_search_n(size_t size,char* first,char* last,int n,char* val,algo_predicate pred) {
-	char* it,limit;
+	char* it;
+	char* limit;
 	int i;
-	limit=first;
-	limit+=last-first;
+	limit=last;
 	limit-=size*n;
 	while(first!=limit) {
 		it=first;
@@ -224,16 +227,16 @@ char* algo_copy_backward(size_t size,char* first,char* last,char* dest,algo_copy
 	}
 	return dest;
 }
-void algo_swap(size_t size,char* a,char* b,algo_move_func mover) {
+void __algo_swap(size_t size,char* a,char* b,algo_move_func mover) {
 	char* thing=malloc(size);
 	mover(2,a,thing);
 	mover(2,b,a);
 	mover(2,thing,b);
 	free(thing);
 }
-char* algo_swap_ranges(size_t size,char* first1,char* last1,char* first2,algo_move_func mover) {
+char* __algo_swap_ranges(size_t size,char* first1,char* last1,char* first2,algo_move_func mover) {
 	while(first1!=last1) {
-		algo_swap(size,first1,first2,mover);
+		__algo_swap(size,first1,first2,mover);
 		first1+=size;
 		first2+=size;
 	}
@@ -265,13 +268,13 @@ char* algo_replace_if(size_t size, char* first, char* last, char* dest, algo_pre
 }
 void algo_fill(size_t size,char* first,char* last,char* value,algo_copy_func copy) {
 	while(first!=last) {
-		copy(first,value);
+		copy(2,first,value);
 		first+=size;
 	}
 }
-void algo_fill_n(size_t size,char* first,char* last,int howMany,char* value,algo_copy_func copy) {
+char* algo_fill_n(size_t size,char* first,char* last,int howMany,char* value,algo_copy_func copy) {
 	while(howMany>0) {
-		copy(first,value,size);
+		copy(2,first,value);
 		first+=size;
 		--howMany;
 	}
@@ -339,14 +342,14 @@ char* algo_unique_copy(size_t size, char* first, char* last,char* dest,algo_pred
 	}
 	return dest+size;
 }
-void algo_reverse(size_t size,char* first,char* last,algo_move_func move) {
+void __algo_reverse(size_t size,char* first,char* last,algo_move_func move) {
 	while((first!=last)&&(first!=last-size)) {
 		last-=size;
-		algo_swap(size,first,last,move);
+		__algo_swap(size,first,last,move);
 		first+=size;
 	}
 }
-char* algo_reverse_copy(size_t size, char* first, char* last,char* dest,algo_function copyFunc) {
+char* __algo_reverse_copy(size_t size, char* first, char* last,char* dest,algo_function copyFunc) {
 	while(first!=last) {
 		last-=size;
 		algo_copy(size,last,last+size,dest,copyFunc);
@@ -357,7 +360,7 @@ char* algo_reverse_copy(size_t size, char* first, char* last,char* dest,algo_fun
 void algo_rotate(size_t size,char* first,char* middle,char* last,algo_replace_func replace) {
 	char* next=middle;
 	while(first!=next) {
-		algo_swap(3,first,next,replace);
+		__algo_swap(3,first,next,replace);
 		first+=size;next+=size;
 		if(next==last) next=middle;
 		else if(first==middle) middle=next;
@@ -371,7 +374,7 @@ void algo_random_shuffle(size_t size,char* first,char* last,algo_move_func move)
 	size_t i,n;
 	n=(last-first);
 	for(i=n-1;i>0;i-=size)
-		algo_swap(3,first+i,first+rand(),move);
+		__algo_swap(3,first+i,first+rand(),move);
 }
 bool algo_is_partitioned(size_t size,char* first,char* last,algo_predicate pred) {
 	while(first!=last&&pred(1,first))
@@ -395,7 +398,7 @@ char* algo_partition(size_t size,char* first,char* last,algo_predicate pred,algo
 			if(first==last)
 				return first;
 		} while(!pred(1,last));
-		algo_swap(size,first,last,move);
+		__algo_swap(size,first,last,move);
 		first+=size;
 	}
 	return first;
@@ -432,17 +435,15 @@ char* algo_partiton_point(size_t size,char* start,char* end,algo_predicate pred)
 	return start;
 }
 void algo_sort(size_t size,char* start,char* end,algo_predicate pred,algo_move_func move) {
-	size_t leftg=0;
-	size_t rightg=(end-start)/size;
-	void qs(size_t left,size_t right) {
+	void qs(char* left,char* right) {
 		if(left==right)
 			return;
-		size_t pivot=start[right];
-		size_t partPoint=algo_partition(size,start+left*size,start+right*size,pred,move);
+		char* pivot=left+(right-left)/2;
+		char* partPoint=algo_partition(size,left,right,pred,move);
 		qs(left,partPoint-size);
 		qs(partPoint+size,right);
 	}
-	qs(leftg,rightg);
+	qs(start,end);
 }
 bool algo_is_sorted(size_t size,char* first,char* last,algo_predicate pred) {
 	if(first==last)
@@ -452,7 +453,7 @@ bool algo_is_sorted(size_t size,char* first,char* last,algo_predicate pred) {
 		next+=size;
 		if(pred(2,next,first))
 			return false;
-		size+=first;
+		first+=size;
 	}
 	return true;
 }
@@ -491,7 +492,7 @@ char* algo_sorted_upper_bound(size_t size,char* first,char* last,char* val,algo_
 		it=first;
 		step=count/2;
 		it+=step*size;
-		if(!pred(val,it)) {
+		if(!pred(2,val,it)) {
 			first=it+size;
 			it+=size;
 			count-=step+1;
@@ -525,10 +526,10 @@ char* algo_sorted_merge(size_t size,char* first1,char* last1,char* first2,char* 
 		dest+=size;
 	}
 }
-char* aglo_sorted_includes(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
+bool aglo_sorted_includes(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
 	while(first2,last2) {
-		if((first1==last1)||(pred(first2,first1))) return false;
-		if(!pred(first1,first2)) first2+=size;
+		if((first1==last1)||(pred(2,first2,first1))) return false;
+		if(!pred(2,first1,first2)) first2+=size;
 		first1+=size;
 	}
 	return true;
@@ -553,8 +554,8 @@ char* algo_sorted_set_union(size_t size,char* first1,char* last1,char* first2,ch
 }
 char* algo_sorted_set_intersection(size_t size,char* first1,char* last1,char* first2,char* last2,char* dest,algo_predicate pred,algo_copy_func copy) {
 	while(first1!=last1 && first2!=last2) {
-		if(pred(first1,first2)) first1+=size;
-		else if(pred(first2,first1)) first2+=size;
+		if(pred(2,first1,first2)) first1+=size;
+		else if(pred(2,first2,first1)) first2+=size;
 		else {
 			copy(2,first1,dest);
 			dest+=size;
@@ -579,10 +580,10 @@ char* algo_sorted_set_difference(size_t size,char* first1,char* last1,char* firs
 char* algo_sorted_symmetric_difference(size_t size,char* start1,char* end1,char* start2,char* end2,char* result,algo_predicate pred,algo_copy_func copy) {
 	if(start1==end1) return algo_copy(size,start2,end2,result,copy);
 	if(start1==end2) return algo_copy(size,start1,end1,result,copy);
-	if(pred(start1,start2)) {
+	if(pred(2,start1,start2)) {
 		copy(2,start1,result);
 		result+=size;start1+=size;
-	} else if(pred(start2,start1)) {
+	} else if(pred(2,start2,start1)) {
 		copy(2,start2,result);
 		result+=size;start2+=size;
 	} else
@@ -593,7 +594,7 @@ char* algo_min_element(size_t size,char* first,char* end,algo_predicate pred) {
 	char* smallest=first;
 	first+=size;
 	while(first!=end)  {
-		if(pred(first,smallest))
+		if(pred(2,first,smallest))
 			smallest=first;
 		first+=size;
 	}
@@ -604,7 +605,7 @@ char* algo_max_element(size_t size,char* first,char* last,algo_predicate pred) {
 	char* biggest=first;
 	first+=size;
 	while(first!=last)  {
-		if(pred(biggest,first))
+		if(pred(2,biggest,first))
 			biggest=first;
 		first+=size;
 	}
@@ -618,15 +619,14 @@ struct algo_pair algo_minmax_element(size_t size,char* start,char* end,algo_pred
 }
 bool algo_lexicographical_compare(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
 	while(first1!=last1) {
-		if(first2==last2 && pred(first2,first1)) return false;
-		else if(pred(first1,first2)) return true;
+		if(first2==last2 && pred(2,first2,first1)) return false;
+		else if(pred(2,first1,first2)) return true;
 		first1+=size;first2+=size;
 	}
 	return first2!=last2;
 }
-//
 //https://www.nayuki.io/page/next-lexicographical-permutation-algorithm
-bool algo_next_permutation(size_t size,char* first,char* last,algo_predicate pred,algo_move_func move) {
+bool __algo_next_permutation(size_t size,char* first,char* last,algo_predicate pred,algo_move_func move) {
 	size_t length=(size_t)(last-first)/size;
 	size_t i=length-1;
 	while(i>0 && pred(2,first+i*size,first+(i-1)*size))
@@ -636,15 +636,15 @@ bool algo_next_permutation(size_t size,char* first,char* last,algo_predicate pre
 	size_t j=length-1;
 	while(pred(2,first+size*j,first+size*(i-1)))
 		j--;
-	algo_swap(size,first+(i-1)*size,first+j*size,move);
+	__algo_swap(size,first+(i-1)*size,first+j*size,move);
 	j=length-1;
 	while(i<j) {
-		algo_swap(size,first+i*size,first+j*size,move);
+		__algo_swap(size,first+i*size,first+j*size,move);
 		i++;j--;
 	}
 	return true;
 }
-bool algo_prev_permutation(size_t size,char* first,char* last,algo_predicate pred,algo_move_func move) {
+bool __algo_prev_permutation(size_t size,char* first,char* last,algo_predicate pred,algo_move_func move) {
 	size_t length=(size_t)(last-first)/size;
 	size_t i=length-1;
 	while(pred(2,first+size*(i-1),first+size*i))
@@ -653,24 +653,29 @@ bool algo_prev_permutation(size_t size,char* first,char* last,algo_predicate pre
 	size_t j=i+1;
 	while(j<length&&pred(2,first+size*j,first+size*(i-1)))
 		j++;
-	algo_swap(size,first+size*(i-1),first+size*(j-1),move);
-	algo_reverse(size,first+i*size,last,move);
+	__algo_swap(size,first+size*(i-1),first+size*(j-1),move);
+	__algo_reverse(size,first+i*size,last,move);
 	return true;
 }
+
+#define algo_reverse(type,first,last,move) __algo_reverse(sizeof(type),$AA(first),$AA(last),$AF(move))
+#define algo_swap(type,a,b,move) __algo_swap(sizeof(type),$AA(a),$AA(b),$AF(move))
+#define algo_prev_permutation(type,first,last,pred,move) __algo_prev_permutation(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(move))
+#define algo_next_permutation(type,first,last,pred,move) __algo_next_permutation(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(move))
 //inplace_merge
 //nth element
 //stablwe partition
 //partialSort
 //stalbe sort
 int main() {
-	int list1[]={3,2,1};
+	int list1[]={1,2,3};
 	bool test(int argsNum,int* x,int* y) {
 		return *x<=*y;
 	}
 	void* mover(int argc,int* in,int* out) {
 		*out=*in;
 	}
-	while(algo_prev_permutation(sizeof(int),list1,list1+3,test,mover))
+	while(algo_next_permutation(int,list1,list1+3,test,mover))
 		printf("%i.%i.%i\n",list1[0],list1[1],list1[2]);
 	return EXIT_SUCCESS;
 }
