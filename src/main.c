@@ -12,7 +12,8 @@ typedef algo_function algo_move_func;
 typedef algo_function algo_replace_func;
 typedef algo_function algo_copy_func;
 typedef algo_function algo_destroy_func;
-bool algo_all_of(size_t size,char* first,char* last,algo_predicate pred) {
+#define algo_all_of(type,first,last,pred) __algo_all_of(sizeof(type),$AA(first),$AA(last),$AP(pred))
+bool __algo_all_of(size_t size,char* first,char* last,algo_predicate pred) {
 while(first!=last) {
 	if(!pred(1,first))
 		return false;
@@ -20,7 +21,8 @@ while(first!=last) {
 	}
 	return true;
 }
-bool algo_any_of(size_t size,char* first,char* last,algo_predicate pred) {
+#define algo_any_of(type,first,last,pred) __algo_any_of(sizeof(type),$AA(first),$AA(last),$AP(pred))
+bool __algo_any_of(size_t size,char* first,char* last,algo_predicate pred) {
 	while(first!=last) {
 		if(pred(1,first))
 			return true;
@@ -28,16 +30,19 @@ bool algo_any_of(size_t size,char* first,char* last,algo_predicate pred) {
 	}
 	return false;
 }
-bool algo_none_of(size_t size,char* first,char* end,algo_predicate pred) {
-	return !algo_any_of(size,first,end,pred);
+#define algo_none_of(type,first,last,pred) __algo_any_of(sizeof(type),$AA(first),$AA(last),$AP(pred))
+bool __algo_none_of(size_t size,char* first,char* end,algo_predicate pred) {
+	return !__algo_any_of(size,first,end,pred);
 }
-void algo_for_each(size_t size,char* first,char* end,algo_function func) {
+#define algo_for_each(type,first,end,func) __algo_for_each(sizeof(type),$AA(first),$AA(last),$AP(pred))
+void __algo_for_each(size_t size,char* first,char* end,algo_function func) {
 	while(first!=end) {
 		func(1,first);
 		first+=size;
 	}
 }
-char* algo_find_if(size_t size,char* first,char* last,algo_predicate pred) {
+#define algo_find_if(type,first,last,pred) __algo_find_if(sizeof(type),$AA(first),$AA(last),$AP(pred))
+char* __algo_find_if(size_t size,char* first,char* last,algo_predicate pred) {
 	while(first!=last) {
 		if(pred(1,first))
 			return first;
@@ -45,7 +50,8 @@ char* algo_find_if(size_t size,char* first,char* last,algo_predicate pred) {
 	}
 	return last;
 }
-char* algo_find_if_not(size_t size,char* first,char* last,algo_predicate pred) {
+#define algo_find_if_not(type,first,last,pred) __algo_find_if_not(sizeof(type),$AA(first),$AA(last),$AP(pred))
+char* __algo_find_if_not(size_t size,char* first,char* last,algo_predicate pred) {
 	while(first!=last) {
 		if(!pred(1,first))
 			return first;
@@ -53,7 +59,8 @@ char* algo_find_if_not(size_t size,char* first,char* last,algo_predicate pred) {
 	}
 	return last;
 }
-char* algo_find_end(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
+#define algo_find_end(type,first1,last1,first2,last2,pred) __algo_find_end(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AP(pred))
+char* __algo_find_end(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
 	size_t elemsIn1=(size_t)(last1-first1)/size;
 	size_t elemsIn2=(size_t)(last2-first2)/size;
 	size_t index=0;
@@ -71,18 +78,20 @@ char* algo_find_end(size_t size,char* first1,char* last1,char* first2,char* last
 	}
 	return last1;
 }
-char* algo_find_first_of(size_t size,char* first1,char* last2,char* selectionStart,char* selectionEnd,algo_predicate pred) {
+#define algo_find_first_of(type,first1,last1,selectionStart,selectionEnd,pred) __algo_find_first_of(sizeof(type),$AA(first1),$AA(last1),$AA(selectionStart),$AA(selectionEnd),$AP(pred))
+char* __algo_find_first_of(size_t size,char* first1,char* last1,char* selectionStart,char* selectionEnd,algo_predicate pred) {
 	size_t itemsInSelection=(size_t)(selectionEnd-selectionStart)/size;
-	while(first1!=last2) {
+	while(first1!=last1) {
 		size_t selectionItem=0;
 		while(selectionStart+selectionItem*size!=selectionEnd)
 			if(pred(2,selectionStart+(selectionItem++)*size,first1))
 				return selectionStart+selectionItem*size;
 		first1+=size;
 	}
-	return last2;
+	return last1;
 }
-char* algo_adjacent_find(size_t size,char* first,char* last,algo_predicate pred) {
+#define algo_adjacent_find(type,first,last,pred) __algo_adjacent_find(sizeof(type),$AA(first),$AA(last),$AP(pred))
+char* __algo_adjacent_find(size_t size,char* first,char* last,algo_predicate pred) {
 	if(first==last)
 		return last;
 	//stay within bounds of function
@@ -94,7 +103,8 @@ char* algo_adjacent_find(size_t size,char* first,char* last,algo_predicate pred)
 	}
 	return last;
 }
-int algo_count_if(size_t size,char* first,char* last,algo_predicate pred) {
+#define algo_count_if(type,first,last,pred) __algo_count_if(sizeof(type),$AA(first),$AA(last),$AP(pred))
+int __algo_count_if(size_t size,char* first,char* last,algo_predicate pred) {
 	int count=0;
 	while(first!=last) {
 		if(pred(1,first))
@@ -107,7 +117,8 @@ struct algo_pair {
 	char* first;
 	char* second;
 };
-struct algo_pair algo_mismatch(size_t size,char* first1,char* last1,char* first2,algo_predicate pred) {
+#define algo_mismatch(type,first1,last1,first2,pred) __algo_mismatch(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AP(pred))
+struct algo_pair __algo_mismatch(size_t size,char* first1,char* last1,char* first2,algo_predicate pred) {
 	size_t index=0;
 	char* last2=last1-first1+first2;
 	struct algo_pair make_return_value() {
@@ -127,7 +138,8 @@ struct algo_pair algo_mismatch(size_t size,char* first1,char* last1,char* first2
 	}
 	return make_return_value();
 }
-bool algo_equal(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
+#define algo_equal(type,first1,last1,first2,last2,pred) __algo_equal(sizeof(type),$AA(first1),$AA(last2),$AA(first2),$AP(pred))
+bool __algo_equal(size_t size,char* first1,char* last1,char* first2,algo_predicate pred) {
 	//ensure length is same
 	size_t array1Size=(size_t)(last1-first1)/size;
 	while(first1!=last1) {
@@ -139,10 +151,11 @@ bool algo_equal(size_t size,char* first1,char* last1,char* first2,char* last2,al
 	return true;
 }
 //tested
-bool algo_is_permutation(size_t size,char* first1,char* last1,char* first2,algo_predicate pred) {
+#define algo_is_permutation(type,first1,last1,first2,pred) __algo_is_permutation(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AP(pred))
+bool __algo_is_permutation(size_t size,char* first1,char* last1,char* first2,algo_predicate pred) {
 	char* last2=last1-first1+first2;
 	size_t array1Size=(size_t)(last1-first1)/size;
-	struct algo_pair temp=algo_mismatch(size,first1,last1,first2,pred);
+	struct algo_pair temp=__algo_mismatch(size,first1,last1,first2,pred);
 	first1=temp.first;
 	first2=temp.second;
 	last2=first2;
@@ -151,15 +164,16 @@ bool algo_is_permutation(size_t size,char* first1,char* last1,char* first2,algo_
 		bool uni(int n,char* a) {
 			return pred(2,a,it);
 		}
-		if(algo_find_if(size,first1,it,$AP(uni))==it) {
-			int n=algo_count_if(size,first2,last2,$AP(uni));
-			if(n==0||algo_count_if(size,it,last1,$AP(uni))!=n)
+		if(__algo_find_if(size,first1,it,$AP(uni))==it) {
+			int n=__algo_count_if(size,first2,last2,$AP(uni));
+			if(n==0||__algo_count_if(size,it,last1,$AP(uni))!=n)
 				return false;
 		}
 	}
 	return true;
 }
-char* algo_search(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
+#define algo_search(type,first1,last1,first2,last2,pred) __algo_search(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AP(pred))
+char* __algo_search(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
  if(first2==last2)
 		return first1;
 	while(first1!=last1) {
@@ -177,7 +191,8 @@ char* algo_search(size_t size,char* first1,char* last1,char* first2,char* last2,
 	}
 	return last1;
 }
-char* algo_search_n(size_t size,char* first,char* last,int n,char* val,algo_predicate pred) {
+#define algo_search_n(type,fist,last,n,val,pred) __algo_search_n(sizeof(type),$AA(first),$AA(last),n,$AA(val),$AP(pred))
+char* __algo_search_n(size_t size,char* first,char* last,int n,char* val,algo_predicate pred) {
 	char* it;
 	char* limit;
 	int i;
