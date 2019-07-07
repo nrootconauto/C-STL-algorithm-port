@@ -68,24 +68,23 @@ char* __algo_find_if_not(size_t size,char* first,char* last,algo_predicate pred)
 //tested
 #define algo_find_end(type,first1,last1,first2,last2,pred) __algo_find_end(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AP(pred))
 char* __algo_find_end(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
-	size_t elemsIn1=(size_t)(last1-first1)/size;
-	size_t elemsIn2=(size_t)(last2-first2)/size;
-	if(elemsIn2==0)
-		return first1;
-	size_t index=0;
+	if(first2==last2) return last1;
+	char* ret=last1;
 	while(first1!=last1) {
-		//if to big quit
-		if(((last1-first1)/size)<elemsIn2-1)
-			return last1;
-		if(pred(2,first1,first2+size*index))
-			index++;
-		else
-			index=0;
-		if(index==elemsIn2)
-			return first1-(index-1)*size;
+		char* it1=first1;
+		char* it2=first2;
+		while(pred(2,it1,it2)) {
+			it1+=size;
+			it2+=size;
+			if(it2==last2) {
+				ret=first1;
+				break;
+			}
+			if(it1==last1) return ret;
+		}
 		first1+=size;
 	}
-	return last1;
+	return ret;
 }
 //tested
 #define algo_find_first_of(type,first1,last1,selectionStart,selectionEnd,pred) __algo_find_first_of(sizeof(type),$AA(first1),$AA(last1),$AA(selectionStart),$AA(selectionEnd),$AP(pred))
@@ -186,26 +185,29 @@ bool __algo_is_permutation(size_t size,char* first1,char* last1,char* first2,alg
 	}
 	return true;
 }
+//tested
 #define algo_search(type,first1,last1,first2,last2,pred) __algo_search(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AP(pred))
 char* __algo_search(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
- if(first2==last2)
+	if(first2==last2)
 		return first1;
 	while(first1!=last1) {
 		char* it1=first1;
 		char* it2=first2;
 		while(pred(2,it1,it2)) {
-			if(pred(2,it2,last2))
-				return first1;
-			if(pred(2,it1,last1))
-				return last1;
-			it1+=size;
 			it2+=size;
+			it1+=size;
+			if(it2==last2)
+				return first1;
+			if(it1==last1)
+				return last1;
+			
 		}
 		first1+=size;
 	}
 	return last1;
 }
-#define algo_search_n(type,fist,last,n,val,pred) __algo_search_n(sizeof(type),$AA(first),$AA(last),n,$AA(val),$AP(pred))
+//tested
+#define algo_search_n(type,first,last,n,val,pred) __algo_search_n(sizeof(type),$AA(first),$AA(last),n,$AA(val),$AP(pred))
 char* __algo_search_n(size_t size,char* first,char* last,int n,char* val,algo_predicate pred) {
 	char* it;
 	char* limit;
@@ -224,6 +226,8 @@ char* __algo_search_n(size_t size,char* first,char* last,int n,char* val,algo_pr
 		first+=size;
 	}
 }
+//tested
+#define algo_copy(type,first,last,dest,copyFunc) __algo_copy(sizeof(type),$AA(first),$AA(last),$AA(dest),$AF(copyFunc))
 char* __algo_copy(size_t size,char* first,char* last,char* dest,algo_copy_func copyFunc) {
 	while(first!=last) {
 		copyFunc(2,first,dest);
@@ -231,18 +235,21 @@ char* __algo_copy(size_t size,char* first,char* last,char* dest,algo_copy_func c
 	}
 	return last;
 }
-#define algo_copy_n(type,first,howMany,out,copyFunc) __algo_copy_n(sizeof(type),$AA(first),$AA(howMany),$AA(out),$AF(copyFunc))
+//tested
+#define algo_copy_n(type,first,howMany,out,copyFunc) __algo_copy_n(sizeof(type),$AA(first),howMany,$AA(out),$AF(copyFunc))
 char* __algo_copy_n(size_t size,char* first,int howMany,char* out,algo_copy_func copyFunc) {
 	int i=0;
 	while(i!=howMany) {
-		copyFunc(2,first+i++*size,out);
+		copyFunc(2,first+i*size,out+i*size);
+		i++;
 	}
 	return first+i*size;
 }
-#define algo_copy_if(type,first,last,dest,pred,copyFunc) __algo_copy_if(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AA(copyFunc))
+//tested
+#define algo_copy_if(type,first,last,dest,pred,copyFunc) __algo_copy_if(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AF(copyFunc))
 char* __algo_copy_if(size_t size,char* first,char* last,char* dest,algo_predicate pred,algo_copy_func copyFunc) {
 	while(first!=last) {
-		if(pred,1,first) {
+		if(pred(1,first)) {
 			copyFunc(2,first,dest);
 			dest+=size;
 		}
@@ -250,15 +257,37 @@ char* __algo_copy_if(size_t size,char* first,char* last,char* dest,algo_predicat
 	}
 	return dest;
 }
+//tested
 #define algo_copy_backward(type,first,last,dest,copyFunc) __algo_copy_backward(sizeof(type),$AA(first),$AA(last),$AA(dest),$AF(copyFunc))
 char* __algo_copy_backward(size_t size,char* first,char* last,char* dest,algo_copy_func copyFunc) {
 	while(last!=first) {
 		last-=size;
-		copyFunc(2,last,dest);
 		dest-=size;
+		copyFunc(2,last,dest);
 	}
 	return dest;
 }
+//tested
+#define algo_move(type,first,last,dest,moveFunc) __algo_move(sizeof(type),$AA(first),$AA(last),$AA(dest),$AF(moveFunc))
+char* __algo_move(size_t size,char* first,char* last,char* result,algo_move_func moveFunc) {
+	while(first!=last) {
+		moveFunc(2,first,result);
+		first+=size;
+		result+=size;
+	}
+	return result;
+}
+//tested
+#define algo_move_backward(type,first,last,dest,moveFunc) __algo_move_backward(sizeof(type),$AA(first),$AA(last),$AA(dest),$AF(moveFunc))
+char* __algo_move_backward(size_t size,char* first,char* last,char* dest,algo_move_func moveFunc) {
+	while(last!=first) {
+		last-=size;
+		dest-=size;
+		moveFunc(2,last,dest);
+	}
+	return dest;
+}
+//tested
 #define algo_swap(type,a,b,mover) __algo_swap(sizeof(type),$AA(a),$AA(b),$AF(mover))
 void __algo_swap(size_t size,char* a,char* b,algo_move_func mover) {
 	char* thing=malloc(size);
@@ -267,6 +296,7 @@ void __algo_swap(size_t size,char* a,char* b,algo_move_func mover) {
 	mover(2,thing,b);
 	free(thing);
 }
+//ranges
 #define algo_swap_ranges(type,first1,last1,first2,mover) __algo_swap_ranges(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AF(mover))
 char* __algo_swap_ranges(size_t size,char* first1,char* last1,char* first2,algo_move_func mover) {
 	while(first1!=last1) {
@@ -276,6 +306,8 @@ char* __algo_swap_ranges(size_t size,char* first1,char* last1,char* first2,algo_
 	}
 	return first2;
 }
+//NOTE:HAS IN OUT-DOESNT DO ANYTHING WITH RETURN
+//TESTED*
 #define algo_transform(type,first1,last1,dest,mutator) __algo_transform(sizeof(type),$AA(first1),$AA(last1),$AA(dest),$AF(mutator))
 char* __algo_transform(size_t size,char* first1,char* last1,char* dest,algo_function mutator) {
 	while(first1!=last1)	{
@@ -285,40 +317,48 @@ char* __algo_transform(size_t size,char* first1,char* last1,char* dest,algo_func
 	}
 	return dest;
 }
-#define algo_replace_copy_if(type,first,last,pred,newValue,replacer) __algo_replace_copy_if(sizeof(type),$AA(first),$AA(last),$AP(pred),$AA(newValue),$AF(replacer))
-void __algo_replace_copy_if(size_t size,char* first,char* last,algo_predicate pred,char* newValue,algo_replace_func replacer) {
-	while(first!=last) {
-		if(pred(1,first)) replacer(2,first,newValue);
-		first+=size;
-	}
-}
-#define algo_replace_if(type,first,last,dest,pred,newValue,replacer) __algo_replace_if(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AA(newValue),$AF(replacer))
-char* __algo_replace_if(size_t size, char* first, char* last, char* dest, algo_predicate pred, char* newValue,algo_replace_func replacer) {
+//tested
+#define algo_replace_copy_if(type,first,last,dest,pred,newValue,replacer) __algo_replace_copy_if(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AA(newValue),$AF(replacer))
+void __algo_replace_copy_if(size_t size,char* first,char* last,char* dest,algo_predicate pred,char* newValue,algo_replace_func replacer) {
 	while(first!=last) {
 		if(pred(1,first)) {
-			replacer(2,dest,newValue);
-			dest+=size;
+			replacer(2,newValue,dest);
+		} else
+			replacer(2,first,dest);
+		first+=size;
+		dest+=size;
+	}
+}
+//tested
+#define algo_replace_if(type,first,last,pred,newValue,replacer) __algo_replace_if(sizeof(type),$AA(first),$AA(last),$AP(pred),$AA(newValue),$AF(replacer))
+char* __algo_replace_if(size_t size, char* first, char* last, algo_predicate pred, char* newValue,algo_replace_func replacer) {
+	while(first!=last) {
+		if(pred(1,first)) {
+			replacer(2,newValue,first);
 		}
 		first+=size;
 	}
-	return dest;
+	return first;
 }
-#define algo_fill(type,first,last,value,copy) __algo_fill(sizeof(type),$AA(first),$AA(last),$AA(value),$AA(copy))
+//tested
+#define algo_fill(type,first,last,value,copy) __algo_fill(sizeof(type),$AA(first),$AA(last),$AA(value),$AF(copy))
 void __algo_fill(size_t size,char* first,char* last,char* value,algo_copy_func copy) {
 	while(first!=last) {
-		copy(2,first,value);
+		copy(2,value,first);
 		first+=size;
 	}
 }
-#define algo_fill_n(type,first,last,howMany,value,copy) __algo_fill_n(sizeof(type),$AA(first),$AA(last),$AA(howMany),$AA(value),$AA(copy))
-char* __algo_fill_n(size_t size,char* first,char* last,int howMany,char* value,algo_copy_func copy) {
+//tested
+#define algo_fill_n(type,first,howMany,value,copy) __algo_fill_n(sizeof(type),$AA(first),howMany,$AA(value),$AF(copy))
+char* __algo_fill_n(size_t size,char* first,int howMany,char* value,algo_copy_func copy) {
 	while(howMany>0) {
-		copy(2,first,value);
+		copy(2,value,first);
 		first+=size;
 		--howMany;
 	}
 	return first;
 }
+//tested
 #define algo_generate(type,first,last,generator)__algo_generate(sizeof(type),$AA(first),$AA(last),$AF(generator))
 void __algo_generate(size_t size,char* first,char* last,algo_function generator) {
 	while(first!=last) {
@@ -327,25 +367,28 @@ void __algo_generate(size_t size,char* first,char* last,algo_function generator)
 		first+=size;
 	}
 }
-#define algo_generate_n(type,first,n,gen) __algo_generate_n(sizeof(type),$AA(first),$AA(n),$AF(gen))
+//tested
+#define algo_generate_n(type,first,n,gen) __algo_generate_n(sizeof(type),$AA(first),n,$AF(gen))
 void __algo_generate_n(size_t size,char* first,int n,algo_function gen) {
 	while(n-- >0) {
 		gen(1,first);
 		first+=size;
 	}
 }
+//tested
+#define algo_remove_if(type,first,last,pred,replacer) __algo_remove_if(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(replacer))
 char* __algo_remove_if(size_t size, char* first, char* last, algo_predicate pred,algo_replace_func replacer) {
 	char* result=first;
 	while(first!=last) {
 		if(!pred(1,first)) {
-			replacer(2,result,first);
+			replacer(2,first,result);
 			result+=size;
 		}
 		first+=size;
 	}
 	return first;
 }
-#define algo_remove_copy_if(type,first,last,dest,pred,copyFunc) __algo_remove_copy_if(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AA(copyFunc))
+#define algo_remove_copy_if(type,first,last,dest,pred,copyFunc) __algo_remove_copy_if(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AF(copyFunc))
 char* __algo_remove_copy_if(size_t size,char* first,char* last,char* dest,algo_predicate pred,algo_copy_func copyFunc) {
 	while(first!=last) {
 		if(!pred(1,first)) {
@@ -737,16 +780,24 @@ bool __algo_prev_permutation(size_t size,char* first,char* last,algo_predicate p
 //partialSort
 //stalbe sort
 int main() {
-	int list1[]={100,201,500};
-	int list2[]={100,2201,500};
+	int list1[]={0,0,0,0,0,0,0,0,0,0};
+	int list2[]={1,2,3,4,5,6,7,8,9,0};
 	bool test(int argc,int* y,int* x) {
-		//printf("A:%i,B:%i\n",*y,*x);
-		return *y==*x;
+		printf("A:%i,B:%i\n",*y,3);
+		return *y%2==0;
 	}
-	void* thing(int argc,char* input) {
-		printf("%i\n",*input);
+	void* replacer(int argc,int* in,int* out) {
+		*out=*in;
 	}
-	printf("%i\n",algo_equal(int,list1,list1+3,list2,test));
+	void* copyFunc(int n,int* in,int* out) {
+		*out=*in;
+	}
+	int x=10;
+	algo_remove_copy_if(int,list2,list2+10,list1,test,replacer);
+	for(int i=0;i!=10;i++)
+		printf("%i,",list1[i]);
+	printf("\n");
+	
 	/*
 	if(algo_find_if_not(int,list1,list1+3,test)!=(char*)(list1+3))
 		printf("list1 success\n");
