@@ -12,6 +12,7 @@ typedef algo_function algo_move_func;
 typedef algo_function algo_replace_func;
 typedef algo_function algo_copy_func;
 typedef algo_function algo_destroy_func;
+//tested
 #define algo_all_of(type,first,last,pred) __algo_all_of(sizeof(type),$AA(first),$AA(last),$AP(pred))
 bool __algo_all_of(size_t size,char* first,char* last,algo_predicate pred) {
 while(first!=last) {
@@ -21,6 +22,7 @@ while(first!=last) {
 	}
 	return true;
 }
+//tested
 #define algo_any_of(type,first,last,pred) __algo_any_of(sizeof(type),$AA(first),$AA(last),$AP(pred))
 bool __algo_any_of(size_t size,char* first,char* last,algo_predicate pred) {
 	while(first!=last) {
@@ -30,17 +32,20 @@ bool __algo_any_of(size_t size,char* first,char* last,algo_predicate pred) {
 	}
 	return false;
 }
+//tested
 #define algo_none_of(type,first,last,pred) __algo_any_of(sizeof(type),$AA(first),$AA(last),$AP(pred))
 bool __algo_none_of(size_t size,char* first,char* end,algo_predicate pred) {
 	return !__algo_any_of(size,first,end,pred);
 }
-#define algo_for_each(type,first,end,func) __algo_for_each(sizeof(type),$AA(first),$AA(last),$AP(pred))
+//tested
+#define algo_for_each(type,first,end,func) __algo_for_each(sizeof(type),$AA(first),$AA(end),$AF(func))
 void __algo_for_each(size_t size,char* first,char* end,algo_function func) {
 	while(first!=end) {
 		func(1,first);
 		first+=size;
 	}
 }
+//tested
 #define algo_find_if(type,first,last,pred) __algo_find_if(sizeof(type),$AA(first),$AA(last),$AP(pred))
 char* __algo_find_if(size_t size,char* first,char* last,algo_predicate pred) {
 	while(first!=last) {
@@ -50,6 +55,7 @@ char* __algo_find_if(size_t size,char* first,char* last,algo_predicate pred) {
 	}
 	return last;
 }
+//tested
 #define algo_find_if_not(type,first,last,pred) __algo_find_if_not(sizeof(type),$AA(first),$AA(last),$AP(pred))
 char* __algo_find_if_not(size_t size,char* first,char* last,algo_predicate pred) {
 	while(first!=last) {
@@ -59,25 +65,29 @@ char* __algo_find_if_not(size_t size,char* first,char* last,algo_predicate pred)
 	}
 	return last;
 }
+//tested
 #define algo_find_end(type,first1,last1,first2,last2,pred) __algo_find_end(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AP(pred))
 char* __algo_find_end(size_t size,char* first1,char* last1,char* first2,char* last2,algo_predicate pred) {
 	size_t elemsIn1=(size_t)(last1-first1)/size;
 	size_t elemsIn2=(size_t)(last2-first2)/size;
+	if(elemsIn2==0)
+		return first1;
 	size_t index=0;
 	while(first1!=last1) {
 		//if to big quit
-		if(elemsIn1>(index+elemsIn2))
+		if(((last1-first1)/size)<elemsIn2-1)
 			return last1;
-		if(pred(2,first1,first2+index))
+		if(pred(2,first1,first2+size*index))
 			index++;
 		else
 			index=0;
 		if(index==elemsIn2)
-			return first1-index;
+			return first1-(index-1)*size;
 		first1+=size;
 	}
 	return last1;
 }
+//tested
 #define algo_find_first_of(type,first1,last1,selectionStart,selectionEnd,pred) __algo_find_first_of(sizeof(type),$AA(first1),$AA(last1),$AA(selectionStart),$AA(selectionEnd),$AP(pred))
 char* __algo_find_first_of(size_t size,char* first1,char* last1,char* selectionStart,char* selectionEnd,algo_predicate pred) {
 	size_t itemsInSelection=(size_t)(selectionEnd-selectionStart)/size;
@@ -85,11 +95,12 @@ char* __algo_find_first_of(size_t size,char* first1,char* last1,char* selectionS
 		size_t selectionItem=0;
 		while(selectionStart+selectionItem*size!=selectionEnd)
 			if(pred(2,selectionStart+(selectionItem++)*size,first1))
-				return selectionStart+selectionItem*size;
+				return first1;
 		first1+=size;
 	}
 	return last1;
 }
+//tested
 #define algo_adjacent_find(type,first,last,pred) __algo_adjacent_find(sizeof(type),$AA(first),$AA(last),$AP(pred))
 char* __algo_adjacent_find(size_t size,char* first,char* last,algo_predicate pred) {
 	if(first==last)
@@ -101,8 +112,9 @@ char* __algo_adjacent_find(size_t size,char* first,char* last,algo_predicate pre
 			return first;
 		first+=size;
 	}
-	return last;
+	return last+size;
 }
+//tested
 #define algo_count_if(type,first,last,pred) __algo_count_if(sizeof(type),$AA(first),$AA(last),$AP(pred))
 int __algo_count_if(size_t size,char* first,char* last,algo_predicate pred) {
 	int count=0;
@@ -117,6 +129,7 @@ struct algo_pair {
 	char* first;
 	char* second;
 };
+//tested
 #define algo_mismatch(type,first1,last1,first2,pred) __algo_mismatch(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AP(pred))
 struct algo_pair __algo_mismatch(size_t size,char* first1,char* last1,char* first2,algo_predicate pred) {
 	size_t index=0;
@@ -138,7 +151,8 @@ struct algo_pair __algo_mismatch(size_t size,char* first1,char* last1,char* firs
 	}
 	return make_return_value();
 }
-#define algo_equal(type,first1,last1,first2,last2,pred) __algo_equal(sizeof(type),$AA(first1),$AA(last2),$AA(first2),$AP(pred))
+//tested
+#define algo_equal(type,first1,last1,first2,pred) __algo_equal(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AP(pred))
 bool __algo_equal(size_t size,char* first1,char* last1,char* first2,algo_predicate pred) {
 	//ensure length is same
 	size_t array1Size=(size_t)(last1-first1)/size;
@@ -723,26 +737,25 @@ bool __algo_prev_permutation(size_t size,char* first,char* last,algo_predicate p
 //partialSort
 //stalbe sort
 int main() {
-	int list1[]={1,2,3};
-	bool test(int argsNum,int* x,int* y) {
-		return *x<=*y;
+	int list1[]={100,201,500};
+	int list2[]={100,2201,500};
+	bool test(int argc,int* y,int* x) {
+		//printf("A:%i,B:%i\n",*y,*x);
+		return *y==*x;
 	}
-	void* mover(int argc,int* in,int* out) {
-		*out=*in;
+	void* thing(int argc,char* input) {
+		printf("%i\n",*input);
 	}
-	while(algo_next_permutation(int,list1,list1+3,test,mover))
-		printf("%i.%i.%i\n",list1[0],list1[1],list1[2]);
+	printf("%i\n",algo_equal(int,list1,list1+3,list2,test));
+	/*
+	if(algo_find_if_not(int,list1,list1+3,test)!=(char*)(list1+3))
+		printf("list1 success\n");
+	else 
+		printf("list1 failure\n");
+	if(algo_find_if_not(int,list2,list2+3,test)!=(char*)(list2+3))
+		printf("list2 success\n");
+	else 
+		printf("list2 fialure\n");
+	*/
 	return EXIT_SUCCESS;
 }
-/*
- * var type=/\w+\*?/
-var name=/\w+/
-function toMacro(str) {
-  str=str.replace(type,"")
-  let name1=str.match(name);
-  str=str.replace(name,"")
-  str=str.replace(/\(.+\)/,"$1")
-  alert(str)
-}
-toMacro("int x()")
-*/
