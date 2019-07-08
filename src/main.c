@@ -233,7 +233,7 @@ char* __algo_copy(size_t size,char* first,char* last,char* dest,algo_copy_func c
 		copyFunc(2,first,dest);
 		first+=size;dest+=size;
 	}
-	return last;
+	return dest;
 }
 //tested
 #define algo_copy_n(type,first,howMany,out,copyFunc) __algo_copy_n(sizeof(type),$AA(first),howMany,$AA(out),$AF(copyFunc))
@@ -388,6 +388,7 @@ char* __algo_remove_if(size_t size, char* first, char* last, algo_predicate pred
 	}
 	return first;
 }
+//tested
 #define algo_remove_copy_if(type,first,last,dest,pred,copyFunc) __algo_remove_copy_if(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AF(copyFunc))
 char* __algo_remove_copy_if(size_t size,char* first,char* last,char* dest,algo_predicate pred,algo_copy_func copyFunc) {
 	while(first!=last) {
@@ -400,6 +401,7 @@ char* __algo_remove_copy_if(size_t size,char* first,char* last,char* dest,algo_p
 	return dest;
 }
 //removes all but one of uitms with conesecutive values
+//tested
 #define algo_unique(type,first,last,pred,replacer) __algo_unique(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(replacer))
 char* __algo_unique(size_t size,char* first,char* last,algo_predicate pred,algo_replace_func replacer) {
 	if(first==last)
@@ -410,12 +412,13 @@ char* __algo_unique(size_t size,char* first,char* last,algo_predicate pred,algo_
 		if(!pred(2,result,first)) {
 			//free the entry
 			result+=size;
-			replacer(2,result,first);
+			replacer(2,first,result);
 		}
 	}
 	return size+result;
 }
-#define algo_unique_copy(type,first,last,dest,pred,copy) __algo_unique_copy(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AA(copy))
+//tested
+#define algo_unique_copy(type,first,last,dest,pred,copy) __algo_unique_copy(sizeof(type),$AA(first),$AA(last),$AA(dest),$AP(pred),$AF(copy))
 char* __algo_unique_copy(size_t size, char* first, char* last,char* dest,algo_predicate pred,algo_copy_func copy) {
 	if(first==last)
 		return dest;
@@ -429,7 +432,6 @@ char* __algo_unique_copy(size_t size, char* first, char* last,char* dest,algo_pr
 	}
 	return dest+size;
 }
-#define algo_reverse(type,first,last,move) __algo_reverse(sizeof(type),$AA(first),$AA(last),$AF(move))
 void __algo_reverse(size_t size,char* first,char* last,algo_move_func move) {
 	while((first!=last)&&(first!=last-size)) {
 		last-=size;
@@ -437,6 +439,7 @@ void __algo_reverse(size_t size,char* first,char* last,algo_move_func move) {
 		first+=size;
 	}
 }
+//tested
 #define algo_reverse_copy(type,first,last,dest,copyFunc) __algo_reverse_copy(sizeof(type),$AA(first),$AA(last),$AA(dest),$AF(copyFunc))
 char* __algo_reverse_copy(size_t size, char* first, char* last,char* dest,algo_function copyFunc) {
 	while(first!=last) {
@@ -446,6 +449,7 @@ char* __algo_reverse_copy(size_t size, char* first, char* last,char* dest,algo_f
 	}
 	return dest;
 }
+//tested
 #define algo_rotate(type,first,middle,last,replace) __algo_rotate(sizeof(type),$AA(first),$AA(middle),$AA(last),$AF(replace))
 void __algo_rotate(size_t size,char* first,char* middle,char* last,algo_replace_func replace) {
 	char* next=middle;
@@ -456,18 +460,21 @@ void __algo_rotate(size_t size,char* first,char* middle,char* last,algo_replace_
 		else if(first==middle) middle=next;
 	}
 }
-#define algo_rotate_copy(type,first,middle,last,dest,copyFunc) __algo_rotate_copy(sizeof(type),$AA(first),$AA(middle),$AA(last),$AA(dest),$AA(copyFunc))
+//tested
+#define algo_rotate_copy(type,first,middle,last,dest,copyFunc) __algo_rotate_copy(sizeof(type),$AA(first),$AA(middle),$AA(last),$AA(dest),$AF(copyFunc))
 char* __algo_rotate_copy(size_t size,char* first,char* middle,char* last,char* dest,algo_copy_func copyFunc) {
-	__algo_copy(size,middle,last,dest,copyFunc);
+	dest=__algo_copy(size,middle,last,dest,copyFunc);
 	return __algo_copy(size,first,middle,dest,copyFunc);
 }
+//tested,its random
 #define algo_random_shuffle(type,first,last,move) __algo_random_shuffle(sizeof(type),$AA(first),$AA(last),$AF(move))
 void __algo_random_shuffle(size_t size,char* first,char* last,algo_move_func move) {
 	size_t i,n;
-	n=(last-first);
-	for(i=n-1;i>0;i-=size)
-		__algo_swap(3,first+i,first+rand(),move);
+	n=(last-first)/size;
+	for(i=n-1;i>0;i--)
+		__algo_swap(3,first+i*size,first+size*(rand()%(i+1)),move);
 }
+//tested
 #define algo_is_partitioned(type,first,last,pred) __algo_is_partitioned(sizeof(type),$AA(first),$AA(last),$AP(pred))
 bool __algo_is_partitioned(size_t size,char* first,char* last,algo_predicate pred) {
 	while(first!=last&&pred(1,first))
@@ -479,6 +486,7 @@ bool __algo_is_partitioned(size_t size,char* first,char* last,algo_predicate pre
 	}
 	return true;
 }
+//tested
 #define algo_partition(type,first,last,pred,move) __algo_partition(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(move))
 char* __algo_partition(size_t size,char* first,char* last,algo_predicate pred,algo_move_func move) {
 	while(first!=last) {
@@ -769,7 +777,7 @@ bool __algo_prev_permutation(size_t size,char* first,char* last,algo_predicate p
 	__algo_reverse(size,first+i*size,last,move);
 	return true;
 }
-
+//tested
 #define algo_reverse(type,first,last,move) __algo_reverse(sizeof(type),$AA(first),$AA(last),$AF(move))
 #define algo_prev_permutation(type,first,last,pred,move) __algo_prev_permutation(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(move))
 #define algo_next_permutation(type,first,last,pred,move) __algo_next_permutation(sizeof(type),$AA(first),$AA(last),$AP(pred),$AF(move))
@@ -780,10 +788,10 @@ bool __algo_prev_permutation(size_t size,char* first,char* last,algo_predicate p
 //partialSort
 //stalbe sort
 int main() {
-	int list1[]={0,0,0,0,0,0,0,0,0,0};
-	int list2[]={1,2,3,4,5,6,7,8,9,0};
+	int list1[]={10,20,30,4,5,6,7,8,9,10};
+	int list2[]={1,1,1,2,2,2,3,3,3,4};
 	bool test(int argc,int* y,int* x) {
-		printf("A:%i,B:%i\n",*y,3);
+		printf("A:%i,B:%i\n",*y,*x);
 		return *y%2==0;
 	}
 	void* replacer(int argc,int* in,int* out) {
@@ -793,16 +801,17 @@ int main() {
 		*out=*in;
 	}
 	int x=10;
-	algo_remove_copy_if(int,list2,list2+10,list1,test,replacer);
+	algo_partition(int,list1,list1+10,test,replacer);
 	for(int i=0;i!=10;i++)
 		printf("%i,",list1[i]);
 	printf("\n");
 	
+	
+	//if(worked)
+	//	printf("list1 success\n");
+	//else 
+	//	printf("list1 failure\n");
 	/*
-	if(algo_find_if_not(int,list1,list1+3,test)!=(char*)(list1+3))
-		printf("list1 success\n");
-	else 
-		printf("list1 failure\n");
 	if(algo_find_if_not(int,list2,list2+3,test)!=(char*)(list2+3))
 		printf("list2 success\n");
 	else 
