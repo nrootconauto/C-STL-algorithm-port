@@ -12,7 +12,7 @@ then use it with your algorithm like `algo_sorted_set_symmetric_difference(char,
 - Normal algorithms from STL are prefixed with `algo_`
 - This currently uses gnu C extensions
 ## Example code
-`
+```
 int main() {
 	char a[]="zyxwde";
 	char b[]="abcdef";
@@ -33,5 +33,4 @@ int main() {
 	printf("%s\n",output);
 	return EXIT_SUCCESS;
 }
-
-`
+```
