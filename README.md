@@ -1,5 +1,5 @@
 # C port of the C++  STL algorithm library
-This is a port of the C++ standard algorithm library. I love C and the C++ STL algorithm library so i implemented (most of it at the moment)  in C. **Be sure to use the src/main.c file for now untill i move the functions tommorow (this is written July 8 2019)**
+This is a port of the C++ standard algorithm library. I love C and the C++ STL algorithm library so i implemented (most of it at the moment)  in C. **Use src/"C_algorithm.h**
 
 ## Using it
 To use an algorithm,use the name,then the args in parenthesis with the first arg as the type,then your usual arguments,but keep in mind these things
