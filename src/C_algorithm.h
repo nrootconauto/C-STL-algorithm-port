@@ -136,4 +136,12 @@ typedef char* (*algo_function)(int numArgs,...);
 //tested
 #define algo_sorted_set_symmetric_difference(type,start1,end1,start2,end2,result,pred,copy) __algo_sorted_set_symmetric_difference(sizeof(type),$AA(start1),$AA(end1),$AA(start2),$AA(end2),$AA(result),$AP(pred),$AF(copy))
 #include "../headers/maxHeap.h"
+//tested
+#define algo_make_heap(type,start1,end1,comp,move) __algo_make_heap(sizeof(type),$AA(start1),$AA(end1),$AP(comp),$AF(move))
+//tested
+#define algo_push_heap(type,start,end,comp,move) __algo_push_heap(sizeof(type),$AA(start),$AA(end),$AP(comp),$AF(move))
+//tested
+#define algo_pop_heap(type,start,end,comp,move) __algo_pop_heap(sizeof(type),$AA(start),$AA(end),$AP(comp),$AF(move))
+//tested
+#define algo_sort_heap(type,start,end,comp,move) __algo_sort_heap(sizeof(type),$AA(start),$AA(end),$AP(comp),$AF(move))
 #endif
