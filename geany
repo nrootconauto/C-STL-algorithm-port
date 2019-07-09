@@ -28,10 +28,11 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=0
-FILE_NAME_0=19372;C;0;EUTF-8;1;1;0;%2Fhome%2Fclayton%2FProjects%2FC_STL_algorithm_port%2Fsrc%2Fmain.c;0;4
-FILE_NAME_1=7981;C++;0;EUTF-8;1;1;0;%2Fhome%2Fclayton%2FProjects%2FC_STL_algorithm_port%2Fsrc%2FC_algorithm.h;0;4
+current_page=3
+FILE_NAME_0=18592;C;0;EUTF-8;1;1;0;%2Fhome%2Fclayton%2FProjects%2FC_STL_algorithm_port%2Fsrc%2Fmain.c;0;4
+FILE_NAME_1=7451;C++;0;EUTF-8;1;1;0;%2Fhome%2Fclayton%2FProjects%2FC_STL_algorithm_port%2Fsrc%2FC_algorithm.h;0;4
 FILE_NAME_2=833;Make;0;EUTF-8;1;1;0;%2Fhome%2Fclayton%2FProjects%2FC_STL_algorithm_port%2FMakefile;0;4
+FILE_NAME_3=462;C;0;EUTF-8;1;1;0;%2Fhome%2Fclayton%2FProjects%2FC_STL_algorithm_port%2Fsrc%2FmaxHeap.c;0;4
 
 [VTE]
 last_dir=/home/clayton/Projects/C_STL_algorithm_port
