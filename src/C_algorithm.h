@@ -1,3 +1,15 @@
+#ifndef C_STL_ALGO_PORT
+#define C_STL_ALGO_PORT
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdarg.h>
+#include <malloc.h>
+typedef bool(*algo_predicate)(int numArgs,...);
+typedef char* (*algo_function)(int numArgs,...); 
+#define $AP(predicate) (algo_predicate)(predicate)
+#define $AF(func) (algo_function)(func)
+#define $AA(argument) (char*)(argument)
 //header for C STL algorithm port
 //tested
 #define algo_all_of(type,first,last,pred) __algo_all_of(sizeof(type),$AA(first),$AA(last),$AP(pred))
@@ -123,4 +135,5 @@
 #define algo_sorted_set_difference(type,first1,last1,first2,last2,result,pred,copy)__algo_sorted_set_difference(sizeof(type),$AA(first1),$AA(last1),$AA(first2),$AA(last2),$AA(result),$AP(pred),$AF(copy))
 //tested
 #define algo_sorted_set_symmetric_difference(type,start1,end1,start2,end2,result,pred,copy) __algo_sorted_set_symmetric_difference(sizeof(type),$AA(start1),$AA(end1),$AA(start2),$AA(end2),$AA(result),$AP(pred),$AF(copy))
-
+#include "../headers/maxHeap.h"
+#endif
