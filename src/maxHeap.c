@@ -24,20 +24,29 @@ void __sift_up(size_t size,char* start,char* end,size_t node,size_t len,algo_pre
 		return;
 	__sift_up(size,start,end,parent,len,comp,move);
 }
-void heapify(size_t size,char* start,char* end,algo_predicate comp,algo_function move)  {
+void __algo_make_heap(size_t size,char* start,char* end,algo_predicate comp,algo_function move)  {
 	size_t len=(end-start)/size;
 	printf("%i\n",len);
 	for(size_t i=len/2;i!=-1;i--)
 		__sift_down(size,start,end,i,len,comp,move);
 }
-void push_heap(size_t size,char* start,char* end,algo_predicate pred,algo_function move) {
+void __algo_push_heap(size_t size,char* start,char* end,algo_predicate pred,algo_function move) {
 	size_t len=(end-start)/size;
 	__sift_up(size,start,end,len-1,len,pred,move);
 }
-void pop_heap(size_t size,char* start,char* end,algo_predicate comp,algo_function move) {
+void __algo_pop_heap(size_t size,char* start,char* end,algo_predicate comp,algo_function move) {
 	size_t len=(end-start)/size;
 	__algo_swap(size,start,start+(len-1)*size,move);
 	end-=size;
 	__sift_down(size,start,end,0,len-1,comp,move);
+}
+void __algo_sort_heap(size_t size,char* start,char* end,algo_predicate comp,algo_function move) {
+	size_t len=(end-start)/size;
+	for(size_t i=len;i>1;) {
+		__algo_swap(size,start+(i-1)*size,start,move);
+		end-=size;
+		i--;
+		__sift_down(size,start,end,0,i,comp,move);
+	}
 }
 #endif
