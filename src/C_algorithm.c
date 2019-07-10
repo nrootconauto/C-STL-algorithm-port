@@ -1,8 +1,4 @@
-#include "C_algorithm.h"
-typedef algo_function algo_move_func;
-typedef algo_function algo_replace_func;
-typedef algo_function algo_copy_func;
-typedef algo_function algo_destroy_func;
+#include "../headers/C_algorithm.h"
 bool __algo_all_of(size_t size,char* first,char* last,algo_predicate pred) {
 while(first!=last) {
 	if(!pred(1,first))
