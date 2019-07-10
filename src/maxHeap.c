@@ -3,7 +3,7 @@
 #ifndef C_ALGO_MAX_HEAP
 #define C_ALGO_MAX_HEAP
 #include <stddef.h>
-#include "C_algorithm.h"
+#include "../headers/C_algorithm.h"
 void __sift_down(size_t size,char* start,char* end,size_t node,size_t len,algo_predicate comp,algo_function move) {
 	size_t child=2*node+1;
 	if(child>len-1)
