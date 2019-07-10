@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <malloc.h>
 typedef bool(*algo_predicate)(int numArgs,...);
-typedef char* (*algo_function)(int numArgs,...); 
+typedef void (*algo_function)(int numArgs,...); 
 #define $AP(predicate) (algo_predicate)(predicate)
 #define $AF(func) (algo_function)(func)
 #define $AA(argument) (char*)(argument)
@@ -144,4 +144,6 @@ typedef char* (*algo_function)(int numArgs,...);
 #define algo_pop_heap(type,start,end,comp,move) __algo_pop_heap(sizeof(type),$AA(start),$AA(end),$AP(comp),$AF(move))
 //tested
 #define algo_sort_heap(type,start,end,comp,move) __algo_sort_heap(sizeof(type),$AA(start),$AA(end),$AP(comp),$AF(move))
+#define algo_partial_sort(type,start,middle,end,comp,move) __algo_partial_sort(sizeof(type),$AA(start),$AA(middle),$AA(end),$AP(comp),$AF(move))
+
 #endif

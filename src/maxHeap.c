@@ -49,4 +49,16 @@ void __algo_sort_heap(size_t size,char* start,char* end,algo_predicate comp,algo
 		__sift_down(size,start,end,0,i,comp,move);
 	}
 }
+bool __algo_is_heap(size_t size,char* start,char* end,algo_predicate comp,algo_function move) {
+	size_t len=(size_t)(end-start)/size;
+	for(size_t i=(len-2)/2;i>-1;--i) {
+		size_t j=2*i+1;
+		if(j<len-1)
+			if(comp(2,start+size*i,start+size*(j+1)))
+				j++;
+		if(comp(2,start+size*i,size*size*j))
+			return false;
+	}
+	return true;
+}
 #endif
