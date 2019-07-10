@@ -1,4 +1,4 @@
-#include "C_algorithm.h"
+#include "../headers/C_algorithm.h"
 //inplace_merge
 //nth element
 //stablwe partition
