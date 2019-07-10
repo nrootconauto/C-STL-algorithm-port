@@ -690,3 +690,16 @@ bool __algo_prev_permutation(size_t size,char* first,char* last,algo_predicate p
 	__algo_reverse(size,first+i*size,last,move);
 	return true;
 }
+void __algo_partial_sort(size_t size,char* start,char* middle,char* last,algo_predicate pred,algo_function move) {
+	if(start<last) {
+		char* pivot=malloc(size);
+		move(2,start,pivot);
+		bool unary(int n,char* item) {
+			return pred(2,item,pivot);
+		}
+		char* p=__algo_partition(size,start,last,(algo_predicate)unary,move);
+		__algo_partial_sort(size,start,middle,p,pred,move);
+		if(p<middle)
+			__algo_partial_sort(size,p+size,middle,last,pred,move);
+	}
+}
